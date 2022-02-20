@@ -102,9 +102,9 @@ jobs:
         uses: protiumx/blogpub@v0.2.3
         with:
           articles_folder: articles
-          devto_api_key: ${{ secrets.DEVTO_API_KEY }}
-          gh_token: ${{ secrets.GH_TOKEN }}
-          medium_token: ${{ secrets.MEDIUM_TOKEN }}
+          devto_api_key: $\{{ secrets.DEVTO_API_KEY }}
+          gh_token: $\{{ secrets.GH_TOKEN }}
+          medium_token: $\{{ secrets.MEDIUM_TOKEN }}
           medium_user_id: <user_id>
 ```
 Few things to take into account:
