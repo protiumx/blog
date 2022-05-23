@@ -5,7 +5,6 @@ tags: rust, peg, http, rest, terminal
 cover_image: ./cover.png
 published: true
 ---
-
 ## Introduction
 
 I happened to have learned about [parsing expression grammars](https://en.wikipedia.org/wiki/Parsing_expression_grammar) a few days ago and got really excited about writing my own grammar.
@@ -14,9 +13,7 @@ As I was missing this [VS Code extension](https://github.com/Huachao/vscode-rest
 
 Preview:
 
-![preview](./preview.gif)
-
-
+![preview](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/preview.gif)
 
 ## Preparation
 
@@ -99,7 +96,7 @@ To write our grammar we will use [pest](https://pest.rs/). From the website:
 
 Sounds great!
 
-Pest has its [own syntax](https://pest.rs/book/grammars/syntax.html) for writing grammar rules. A rule** is defined as follows:
+Pest has its [own syntax](https://pest.rs/book/grammars/syntax.html) for writing grammar rules. A **rule** is defined as follows:
 
 ```
 my_rule = { ... }
@@ -117,7 +114,7 @@ testy_file = {
 
 Let's test this out in the online grammar editor:
 
-![editor](./pest-editor.png)
+![editor](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/pest-editor.png)
 
 The parser has identified a `testy_file` that contains to matches for the rule `my_rule`. So far so good.
 
@@ -134,7 +131,7 @@ request = {
 }
 ```
 
-Our `request` rule says: a `request_line` optionally followed by `headers` followed by a new line, then optionally followed by the `body`. With optionally I make reference to the `?` mark which is a repetion operator (those who are familiar with regex expressions should understand this right away) and means that something ` can occur zero or one times`. 
+Our `request` rule says: a `request_line` optionally followed by `headers` followed by a new line, then optionally followed by the `body`. With optionally I make reference to the `?` mark which is a repetition operator (those who are familiar with regex expressions should understand this right away) and means that something ` can occur zero or one times`. 
 For our `request_line` we will match the standard as follows:
 
 ```
@@ -172,7 +169,7 @@ uri = { (!whitespace ~ ANY)+ }
 whitespace = _{ " " | "\t" }
 ```
 
-Note: here we also defined that the `white space` can be a space or a tab. Note that `_` means that the rule is [silent](https://pest.rs/book/grammars/syntax.html#silent-and-atomic-rules); it does not produce tokens.
+**Note:** here we also defined that the `white space` can be a space or a tab. Note that `_` means that the rule is [silent](https://pest.rs/book/grammars/syntax.html#silent-and-atomic-rules); it does not produce tokens.
 
 The HTTP version goes like:
 
@@ -186,7 +183,7 @@ Finally, we require a `NEWLINE` at the end of our request line.
 
 Let's test this out on the editor.
 
-![request line](./request-line.png)
+![request line](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/request-line.png)
 
 Perfect! Note that the `whitespace` rule does not produce a token, we only see `method`, `uri` and `version`. Let's continue with the headers.
 
@@ -202,9 +199,9 @@ The `header_value` is anything except for a **new line**, because the new line d
 
 Let's test this again:
 
-![headers](./headers.png)
+![headers](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/headers.png)
 
-Here we can se that the parser matches 1 header as `{ header_name: "auth", header_value: "token" }`. Did you noticed that it also say `headers > header` ? That is because we also want a rule that can matches a 1 or more `header` rules. We define this rule as:
+Here we can se that the parser matches 1 header as `{ header_name: "auth", header_value: "token" }`. Did you notice that it also say `headers > header` ? That is because we also want a rule that can matches a 1 or more `header` rules. We define this rule as:
 
 ```
 headers = { header+ }
@@ -220,14 +217,14 @@ body = { ANY+ }
 
 The body is anything after the headers
 
-![body](./body.png)
+![body](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/body.png)
 
-So far our grammar can parse 1 request from the input. Comming back to the idea for this post, we want to be able to parse multiple http requests from a file. But here we have a conflict because our `body` rule will match anything after the headers, and that anything can be another request.
+So far our grammar can parse 1 request from the input. Coming back to the original idea for this post, we want to be able to parse multiple http requests from a file. But here we have a conflict because our `body` rule will match anything after the headers, and that anything can be another request.
 To solve this problem we need the help of a :sparkles: delimiter :sparkles:
 
 ## The .http file syntax
 
-To delimite each http request in our file we will make use of 3 `#` symbols (as the VS Code rest client does).
+To delimit each http request in our file we will make use of 3 `#` symbols (as the VS Code rest client does).
 Let's go add this to our grammar:
 
 ```
@@ -242,7 +239,7 @@ body = { (!delimiter ~ ANY)+ }
 
 Let's test this:
 
-![multiple requests](./multiple.png)
+![multiple requests](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/multiple.png)
 
 Nice! So finally we can define what our http file should look like:
 
@@ -253,7 +250,7 @@ file = { SOI ~ (delimiter | request)* ~ EOI}
 Our http file is composed by delimiters or requests, 0 or more of them.
 We have completed our http grammar, now it's time to get **rusty**
 
-![get schwifty](./schwifty.jpeg)
+![get schwifty](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/schwifty.jpeg)
 
 ## Parsing http files
 
@@ -275,7 +272,7 @@ We will use the following file for testing
 
 ```
 GET https://protiumx.github.io HTTP/1.1
-authorzation: token
+authorization: token
 
 ###
 
@@ -286,7 +283,7 @@ POST https://rq-rust.free.beeceptor.com/api HTTP/1.1
 }
 ```
 
-Note: I setted up a mock api in https://beeceptor.com/. It might not be available by the time you are reading this. But you can use any endpoint that accepts **POST**.
+**Note:** I set up a mock api in https://beeceptor.com/. It might not be available by the time you are reading this. But you can use any endpoint that accepts **POST**.
 
 Let's go ahead an parse the file
 
@@ -390,7 +387,7 @@ impl<'i> TryFrom<Pair<'i, Rule>> for HttpFile {
 }
 ```
 
-Note: `Pair<'i, Rule>` has the lifetime of the `input`.
+**Note:** `Pair<'i, Rule>` has the lifetime of the `input`.
 As we know, the `file` rule can contain 0 or more of (delimiter | request). This means that in its content we can find: delimiter, request or End of File.
 Here we will **try** to parse each request, so we need the `TryFrom` trait for the `HttpRequest` struct
 
@@ -427,7 +424,7 @@ impl<'i> TryFrom<Pair<'i, Rule>> for HttpRequest {
 }
 ```
 
-![egghead](./egghead.jpeg)
+![egghead](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/egghead.jpeg)
 
 Each `request` can have 5 inner matches: method, url, version, headers and body.
 The first 3 do not have inner rules, so we can just extract them as `&str`. After this, the iterator can only have `headers` or `body` pairs. For the `headers` we perform a similar operation:
@@ -499,8 +496,8 @@ impl HttpClient {
 
 What we can see in here:
 
-- Use the `ClientBuilder` to add soem default headers and config for the request
-- Parse our `HttpMethod` into `reqwest::Method`. Note: `HttpMethod` implements the `Display` trait.
+- Use the `ClientBuilder` to add some default headers and config for the request
+- Parse our `HttpMethod` into `reqwest::Method`. **Note:** `HttpMethod` implements the `Display` trait.
 - Parse our `HashMap<String, String` of headers into `reqwest::header::HeaderMap`. This is possible because it implements the `TryFrom<HashMap<String, String>>` trait.
 - Finally clone the body and send the request. We output the body of the request as `text` (this consumes the body)
 
@@ -527,7 +524,7 @@ Note that the `HttpRequest` implements the `Display` trait.
 
 The result:
 
-![prompt](./prompt.png)
+![prompt](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/prompt.png)
 
 Gorgeous.
 
@@ -543,13 +540,6 @@ That's it. Thanks for reading :alien:
 Others posts:
 
 Related articles:
-{{#if medium}}
-- [Publish your blog articles everywhere with this github action](https://medium.com/@protiumx/publish-your-blog-articles-everywhere-with-this-github-action-f80b9f9882a8)
-- [Coding Problems, TDD, and CI](https://medium.com/@protiumx/coding-problems-tdd-and-ci-106f0951564e)
-- [Your new pretty and minimalist resume with LaTex](https://medium.com/@protiumx/your-new-pretty-and-minimalist-resume-with-latex-c716bbeb8d2b)
-{{/if}}
-{{#if devto}}
 - [Publish your blog articles everywhere with this github action](https://dev.to/protium/publish-your-blog-articles-everywhere-with-this-github-action-3g6k)
 - [Coding Problems, TDD, and CI](https://dev.to/protium/coding-problems-tdd-and-ci-282n)
 - [Your new pretty and minimalist resume with LaTex](https://dev.to/protium/your-new-pretty-and-minimalist-resume-with-latex-421j)
-{{/if}}
