@@ -1,21 +1,24 @@
 ---
 title: Publish your blog articles everywhere with this github action
-tags: ci, github, typescript, blogging
-published: true
+date: "2022-01-17"
+tags:
+  - automation
+  - github actions
+  - blogging
+  - blogpub
+  - ci
+slug: publish-your-blog-articles-with-this-github-action
 ---
 Long ago I made this [comment](https://dev.to/protium/comment/clno) in this [article](https://dev.to/maxime1992/manage-your-dev-to-blog-posts-from-a-git-repo-and-use-continuous-deployment-to-auto-publish-update-them-143j):
 
-```
-This is a really good idea with great potential. 
+
+> This is a really good idea with great potential. 
 Imagine a standarized API for different blogs. 
 You can automatize publishing and editing, multiple collaborators.
-And use a git provider as unique source of content.
-
+and use a git provider as unique source of content.
 And you can also make your git repo as some sort of blog.
 I'll use it for my next posts for sure.
-
 Thanks!
-```
 
 It was an idea that I had left on the back of my head and I didn't come back to it because I wasn't writing articles actively. But this has changed in the last months and I have published 6 articles during December. So I decided to revisit the idea and finally develop it.
 
@@ -33,12 +36,12 @@ In fact, this article was automatically published by `blogpub` and you can see i
 Sometimes we want to add different content to our blog posts depending on the platform, for instance for `dev.to` I want to use `liquid tags`, which `medium` doesn't support.
 For this purpose I have used [handlebars](https://handlebarsjs.com/) to make use of conditionals. Example:
 ```md
-\{{#if medium}}
+{{#if medium}}
 This is only for Medium
-\{{/if}}
-\{{#if devto}}
+{{if}}
+{{#if devto}}
 This is only for DEV.to
-\{{/if}}
+{{if}}
 ```
 
 For the first release of the action, the template context contains:
@@ -128,10 +131,6 @@ What else would you like to have? Let me know in the comments!
 That's it!
 As usual, any help is well received and I have a [TODO](https://github.com/protiumx/blogpub#todo) list if you would like to collaborate with this project.
 
-{{#if devto}}
-{% github protiumx/blogpub %}
-{{else}}
 [blogpub repo](https://github.com/protiumx/blogpub)
-{{/if}}
 
 :robot:

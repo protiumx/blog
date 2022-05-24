@@ -1,0 +1,70 @@
+baseURL = "https://protiumx.github.io/"
+languageCode = "en-us"
+title = "protiumx blog"
+theme = "hello-friend-ng"
+
+paginate = 10
+
+disableRSS     = false
+disableSitemap = false
+disable404     = false
+enableEmoji     = true
+enableRobotsTXT = true
+defaultTheme = "light"
+PygmentsStyle = "monokai"
+
+[author]
+  name = "Brian Mayo <ioprotium@gmail.com>"
+
+[params]
+  dateform        = "Jan 2, 2006"
+  dateformShort   = "Jan 2"
+  dateformNum     = "2006-22-01"
+  dateformNumTime = "2006-22-01"
+
+  # Subtitle for home
+  homeSubtitle = "protiumx"
+
+  # Set disableReadOtherPosts to true in order to hide the links to other posts.
+  disableReadOtherPosts = false
+
+  # Enable sharing buttons, if you like
+  enableSharingButtons = true
+  EnableThemeToggle = true
+
+  # Metadata mostly used in document's head
+  description = "protiumx blog"
+  keywords = "blog, software, engineering, rust, golang"
+  images = [""]
+
+[[params.social]]
+  name = "github"
+  url = "https://github.com/protiumx/"
+
+[[params.social]]
+  name = "linkedin"
+  url  = "https://www.linkedin.com/in/bdmayo/"
+
+[params.logo]
+    logoText     = "$ cat protiumx/blog"
+    logoHomeLink = "/"
+    logoCursorColor = "#8631B4"
+
+[taxonomies]
+    category = "blog"
+    tag      = "tags"
+    series   = "series"
+
+[menu]
+  [[menu.main]]
+    identifier = "about"
+    name       = "About"
+    url        = "about/"
+  [[menu.main]]
+    identifier = "posts"
+    name       = "Posts"
+    url        = "posts/"
+
+[languages]
+  [languages.en]   
+    copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'

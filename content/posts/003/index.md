@@ -1,10 +1,16 @@
 ---
 title: kitty + zsh + powerlevel10k = ✨ aesthetics ✨
+date: "2022-05-09"
+slug: kitty-zsh-powerlevel10k-aesthetics
 description: Make your terminal look like an NFT
-tags: terminal, kitty, zsh, macos
+tags: 
+  - terminal
+  - kitty
+  - zsh
+  - macos
+  - dotfile
 published: true
 ---
-
 Who doesn't like a good looking terminal and useful layouts and keymaps?
 This has always been my goal since I started using linux as main OS.
 
@@ -139,15 +145,9 @@ I'm using a github action to publish it to different platforms. Read more
 {{/if}}
 
 Related articles:
-{{#if medium}}
-- [Bash + GNU Stow: take a walk while your new macbook is being set up](https://medium.com/@protiumx/bash-gnu-stow-take-a-walk-while-your-new-macbook-is-being-set-up-351a6f2f9225)
-- [Kitty configuration for the iTerm user](https://medium.com/@protiumx/kitty-configuration-for-the-iterm-user-41a390579a8c)
-- [Vim: Delightful settings and plugins](https://medium.com/@protiumx/vim-delightful-settings-and-plugins-d6debfc2c5df)
-{{/if}}
-{{#if devto}}
+
 - [Bash + GNU Stow: take a walk while your new macbook is being set up](https://dev.to/protium/bash-gnu-stow-take-a-walk-while-your-new-macbook-is-being-set-up-p1o)
 - [Kitty configuration for the iTerm user](https://dev.to/protium/kitty-configuration-for-the-iterm-user-pe4)
 - [Vim: Delightful settings and plugins](https://dev.to/protium/vim-delightful-settings-and-plugins-18am)
-{{/if}}
 
 :alien:
