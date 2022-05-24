@@ -1,4 +1,4 @@
-baseURL = "https://protiumx.github.io/"
+baseURL = "https://protiumx.github.io/blog/"
 languageCode = "en-us"
 title = "protiumx blog"
 theme = "hello-friend-ng"
