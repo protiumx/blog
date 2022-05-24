@@ -20,7 +20,7 @@ As I was missing this [VS Code extension](https://github.com/Huachao/vscode-rest
 
 Preview:
 
-![preview](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/preview.gif)
+![preview](./preview.gif)
 
 ## Preparation
 
@@ -190,7 +190,7 @@ Finally, we require a `NEWLINE` at the end of our request line.
 
 Let's test this out on the editor.
 
-![request line](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/request-line.png)
+![request line](./request-line.png)
 
 Perfect! Note that the `whitespace` rule does not produce a token, we only see `method`, `uri` and `version`. Let's continue with the headers.
 
@@ -206,7 +206,7 @@ The `header_value` is anything except for a **new line**, because the new line d
 
 Let's test this again:
 
-![headers](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/headers.png)
+![headers](./headers.png)
 
 Here we can se that the parser matches 1 header as `{ header_name: "auth", header_value: "token" }`. Did you notice that it also say `headers > header` ? That is because we also want a rule that can matches a 1 or more `header` rules. We define this rule as:
 
@@ -224,7 +224,7 @@ body = { ANY+ }
 
 The body is anything after the headers
 
-![body](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/body.png)
+![body](./body.png)
 
 So far our grammar can parse 1 request from the input. Coming back to the original idea for this post, we want to be able to parse multiple http requests from a file. But here we have a conflict because our `body` rule will match anything after the headers, and that anything can be another request.
 To solve this problem we need the help of a :sparkles: delimiter :sparkles:
@@ -246,7 +246,7 @@ body = { (!delimiter ~ ANY)+ }
 
 Let's test this:
 
-![multiple requests](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/multiple.png)
+![multiple requests](./multiple.png)
 
 Nice! So finally we can define what our http file should look like:
 
@@ -257,7 +257,7 @@ file = { SOI ~ (delimiter | request)* ~ EOI}
 Our http file is composed by delimiters or requests, 0 or more of them.
 We have completed our http grammar, now it's time to get **rusty**
 
-![get schwifty](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/schwifty.jpeg)
+![get schwifty](./schwifty.jpeg)
 
 ## Parsing http files
 
@@ -431,7 +431,7 @@ impl<'i> TryFrom<Pair<'i, Rule>> for HttpRequest {
 }
 ```
 
-![egghead](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/egghead.jpeg)
+![egghead](./egghead.jpeg)
 
 Each `request` can have 5 inner matches: method, url, version, headers and body.
 The first 3 do not have inner rules, so we can just extract them as `&str`. After this, the iterator can only have `headers` or `body` pairs. For the `headers` we perform a similar operation:
@@ -531,7 +531,7 @@ Note that the `HttpRequest` implements the `Display` trait.
 
 The result:
 
-![prompt](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/prompt.png)
+![prompt](./prompt.png)
 
 Gorgeous.
 
