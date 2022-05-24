@@ -14,9 +14,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: blogpub
-        uses: protiumx/blogpub@v0.5.0
+        uses: protiumx/blogpub@main
         with:
-          articles_folder: articles
+          articles_folder: content/posts
           devto_api_key: ${{ secrets.DEVTO_API_KEY }}
           gh_token: ${{ secrets.GH_TOKEN }}
           medium_token: ${{ secrets.MEDIUM_TOKEN }}

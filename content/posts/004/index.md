@@ -1,6 +1,13 @@
 ---
 title: Automate an articles section in your github.io page
-tags: ci, githubaction, githubpages, automation, career
+date: "2022-05-13"
+slug: automate-an-articles-section-in-your-github-io-page
+tags: 
+  - ci, 
+  - github actions
+  - github pages
+  - automation
+  - profile
 cover_image: ./cover.png
 published: true
 ---
@@ -69,12 +76,6 @@ NOTE: I added the `workflow_dispatch` trigger so I can trigger the action from t
 That's all. I few lines of code and we added an automated section for our github page (or any page).
 
 Related articles:
-{{#if medium}}
-- [Publish your blog articles everywhere with this github action](https://medium.com/@protiumx/publish-your-blog-articles-everywhere-with-this-github-action-f80b9f9882a8)
-{{/if}}
-{{#if devto}}
-- [Publish your blog articles everywhere with this github action](https://dev.to/protium/publish-your-blog-articles-everywhere-with-this-github-action-3g6k)
-{{/if}}
-
+- [Publish your blog articles everywhere with this github action]({{< ref "/posts/001/index.md" >}})
 
 👽

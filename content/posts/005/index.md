@@ -1,7 +1,14 @@
 ---
 title: An HTTP request parser with rust and pest.rs
+slug: an-http-request-parser-with-rust-and-pest-rs
 description: Writing an interactive prompt to send HTTP requests
-tags: rust, peg, http, rest, terminal
+date: "2022-05-23"
+tags: 
+  - rust
+  - peg
+  - pest
+  - rest
+  - terminal
 cover_image: ./cover.png
 published: true
 ---
@@ -391,7 +398,7 @@ impl<'i> TryFrom<Pair<'i, Rule>> for HttpFile {
 As we know, the `file` rule can contain 0 or more of (delimiter | request). This means that in its content we can find: delimiter, request or End of File.
 Here we will **try** to parse each request, so we need the `TryFrom` trait for the `HttpRequest` struct
 
-```rus
+```rust
 impl<'i> TryFrom<Pair<'i, Rule>> for HttpRequest {
     type Error = Error<Rule>;
 
@@ -540,6 +547,6 @@ That's it. Thanks for reading :alien:
 Others posts:
 
 Related articles:
-- [Publish your blog articles everywhere with this github action](https://dev.to/protium/publish-your-blog-articles-everywhere-with-this-github-action-3g6k)
+- [Publish your blog articles everywhere with this github action]({{< ref "/posts/001/index.md" >}})
 - [Coding Problems, TDD, and CI](https://dev.to/protium/coding-problems-tdd-and-ci-282n)
 - [Your new pretty and minimalist resume with LaTex](https://dev.to/protium/your-new-pretty-and-minimalist-resume-with-latex-421j)
