@@ -1,10 +1,17 @@
 ---
-tags: automation, github, ci, typescript, blogging
+title: 'blogpub@v0.4.1: host media on github for your blog posts'
+slug: host-media-on-github-for-your-blog-posts
+date: "2022-02-21"
+tags: 
+  - automation
+  - github actions
+  - ci
+  - typescript
+  - blogging
+  - blogpub
+
 published: true
 ---
-
-# blogpub@v0.4.1: host media on github for your blog posts
-
 Hey everyone, this is just a small update on the [blogpub](https://github.com/marketplace/actions/blogpub) action.
 
 ## Relative paths
@@ -23,3 +30,6 @@ That's all!
 
 What other feature would you find useful for this action?
 Let me know in the comments.
+
+Related articles:
+- [Publish your blog articles everywhere with this github action]({{<ref "/posts/001/index.md" >}})
