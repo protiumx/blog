@@ -55,15 +55,19 @@ PygmentsStyle = "monokai"
     tag      = "tags"
     series   = "series"
 
-[menu]
-  [[menu.main]]
-    identifier = "about"
-    name       = "About"
-    url        = "about/"
+[menu]  
   [[menu.main]]
     identifier = "posts"
     name       = "Posts"
     url        = "posts/"
+  [[menu.main]]
+    identifier = "about"
+    name       = "About"
+    url        = "https://protiumx.github.io"
+  [[menu.main]]
+    identifier = "github"
+    name       = "Github"
+    url        = "https://github.com/protiumx"
 
 [languages]
   [languages.en]   
