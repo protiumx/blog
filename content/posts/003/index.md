@@ -2,6 +2,7 @@
 title: kitty + zsh + powerlevel10k = ✨ aesthetics ✨
 date: "2022-05-09"
 slug: kitty-zsh-powerlevel10k-aesthetics
+toc: true
 description: Make your terminal look like an NFT
 tags: 
   - terminal

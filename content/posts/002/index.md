@@ -2,6 +2,7 @@
 title: 'blogpub@v0.4.1: host media on github for your blog posts'
 slug: host-media-on-github-for-your-blog-posts
 date: "2022-02-21"
+toc: true
 tags: 
   - automation
   - github actions

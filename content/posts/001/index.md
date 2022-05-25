@@ -1,6 +1,7 @@
 ---
 title: Publish your blog articles everywhere with this github action
 date: "2022-01-17"
+toc: true
 tags:
   - automation
   - github actions

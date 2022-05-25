@@ -2,6 +2,7 @@
 title: Automate an articles section in your github.io page
 date: "2022-05-13"
 slug: automate-an-articles-section-in-your-github-io-page
+toc: true
 tags: 
   - ci, 
   - github actions

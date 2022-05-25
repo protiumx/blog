@@ -3,6 +3,7 @@ title: An HTTP request parser with rust and pest.rs
 slug: an-http-request-parser-with-rust-and-pest-rs
 description: Writing an interactive prompt to send HTTP requests
 date: "2022-05-23"
+toc: true
 tags: 
   - rust
   - peg
@@ -10,6 +11,9 @@ tags:
   - rest
   - terminal
 cover_image: ./cover.png
+images:
+  - ./cover.png
+  - ./prompt.png
 published: true
 ---
 ## Introduction
@@ -121,7 +125,7 @@ testy_file = {
 
 Let's test this out in the online grammar editor:
 
-![editor](https://raw.githubusercontent.com/protiumx/blog/main/articles/005/pest-editor.png)
+![editor](./pest-editor.png)
 
 The parser has identified a `testy_file` that contains to matches for the rule `my_rule`. So far so good.
 
