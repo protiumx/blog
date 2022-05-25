@@ -3,7 +3,7 @@ title: My profile website is now a terminal
 date: 2022-05-25T11:42:13+02:00
 published: true
 images:
-  - ./cover.png
+  - /posts/006/cover.png
 tags:
   - blogging
   - javascript
