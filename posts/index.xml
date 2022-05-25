@@ -65,7 +65,7 @@ As I was missing this <a href="https://github.com/Huachao/vscode-restclient">VS 
     ~ EOI
 }
 </code></pre><p>Let&rsquo;s test this out in the online grammar editor:</p>
-<p><img src="https://raw.githubusercontent.com/protiumx/blog/main/articles/005/pest-editor.png" alt="editor"></p>
+<p><img src="./pest-editor.png" alt="editor"></p>
 <p>The parser has identified a <code>testy_file</code> that contains to matches for the rule <code>my_rule</code>. So far so good.</p>
 <h2 id="http-grammar">HTTP Grammar</h2>
 <p>Now we are ready for writing our grammar (are we?). We need to write this grammar as close as possible to the standard, since it&rsquo;s defined in a similar way, with <strong>rules</strong>. We can imagine something like this</p>
