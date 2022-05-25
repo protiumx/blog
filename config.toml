@@ -14,7 +14,10 @@ defaultTheme = "light"
 PygmentsStyle = "monokai"
 
 [author]
-  name = "Brian Mayo <ioprotium@gmail.com>"
+  name = "Brian Mayo"
+
+[permalinks]
+  posts = "/posts/:title/"
 
 [params]
   dateform        = "Jan 2, 2006"
@@ -23,7 +26,7 @@ PygmentsStyle = "monokai"
   dateformNumTime = "2006-22-01"
 
   # Subtitle for home
-  homeSubtitle = "protiumx"
+  homeSubtitle = "a simple dev blog"
 
   # Set disableReadOtherPosts to true in order to hide the links to other posts.
   disableReadOtherPosts = false
@@ -33,9 +36,18 @@ PygmentsStyle = "monokai"
   EnableThemeToggle = true
 
   # Metadata mostly used in document's head
-  description = "protiumx blog"
+  description = "protiumx dev blog"
   keywords = "blog, software, engineering, rust, golang"
   images = [""]
+
+[params.footer]
+  trademark = true
+  rss = true
+  copyright = true
+  author = true
+
+  topText = []
+  bottomText = []
 
 [[params.social]]
   name = "github"
