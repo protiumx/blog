@@ -133,7 +133,7 @@ if (ev.ctrlKey && ev.key === 'l') {
 }
 ```
 
-and `SIGINT`
+and the `SIGINT`
 
 ```js
 if (ev.ctrlKey && ev.key === 'c') {
