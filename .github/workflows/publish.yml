@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     paths:
-      - 'articles/**'
+      - 'content/posts/**'
 jobs:
   publish:
     name: publish new article
