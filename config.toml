@@ -60,7 +60,7 @@ PygmentsStyle = "monokai"
 [params.logo]
     logoText     = "$ cat protiumx/blog"
     logoHomeLink = "/"
-    logoCursorColor = "#8631B4"
+    logoCursorColor = "#c7157a"
 
 [taxonomies]
     category = "blog"
