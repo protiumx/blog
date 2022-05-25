@@ -85,7 +85,7 @@ Let&rsquo;s now define 1 command:</p>
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">term</span>.<span style="color:#a6e22e">clear</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span>;
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>and <code>SIGINT</code></p>
+</span></span></code></pre></div><p>and the <code>SIGINT</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">ctrlKey</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;c&#39;</span>) {
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">prompt</span>(<span style="color:#a6e22e">term</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">userInput</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
