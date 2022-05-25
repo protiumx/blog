@@ -226,7 +226,8 @@ The result:
 I think this should do it for a `profile terminal`. I'm very satisfied with the simplicity of it and the commands I have implemented.
 I'll problaly add more commands in the future and also implement `streams` , just for fun.
 
-What command would you add to yout **profile terminal**?
+What command would you add to your **profile terminal**?
+Go have some fun with it: https://protiumx.dev
 
 Other articles:
 
