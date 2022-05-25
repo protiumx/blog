@@ -146,7 +146,8 @@ For this I found this amazing <a href="https://cataas.com/#/">rest API</a></p>
 <p><img src="./randc.gif" alt="get a cat"></p>
 <p>I think this should do it for a <code>profile terminal</code>. I&rsquo;m very satisfied with the simplicity of it and the commands I have implemented.
 I&rsquo;ll problaly add more commands in the future and also implement <code>streams</code> , just for fun.</p>
-<p>What command would you add to yout <strong>profile terminal</strong>?</p>
+<p>What command would you add to your <strong>profile terminal</strong>?
+Go have some fun with it: <a href="https://protiumx.dev">https://protiumx.dev</a></p>
 <p>Other articles:</p>
 <ul>
 <li><a href="https://protiumx.github.io/blog/posts/publish-your-blog-articles-with-this-github-action/">Publish your blog articles everywhere with this github action</a></li>
