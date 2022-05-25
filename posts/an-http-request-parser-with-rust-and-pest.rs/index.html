@@ -1,0 +1,275 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=author content="Brian Mayo "><meta name=description content="Writing an interactive prompt to send HTTP requests"><meta name=keywords content="blog,software,engineering,rust,golang,rust,peg,pest,rest,terminal"><meta name=robots content="noodp"><meta name=theme-color content><link rel=canonical href=https://protiumx.dev/blog/posts/an-http-request-parser-with-rust-and-pest.rs/><title>An HTTP request parser with rust and pest.rs :: protiumx blog</title><link href=https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css rel=stylesheet type=text/css><link rel=stylesheet href=/blog/main.5fd4a6005d53ab1c5cd1ed9e22e465399ea7746a3b0fd2a7a5296ace182ea3d5.css><link rel=apple-touch-icon sizes=180x180 href=/blog/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/blog/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/blog/favicon-16x16.png><link rel=manifest href=/blog/site.webmanifest><link rel=mask-icon href=/blog/safari-pinned-tab.svg color><link rel="shortcut icon" href=/blog/favicon.ico><meta name=msapplication-TileColor content><meta itemprop=name content="An HTTP request parser with rust and pest.rs"><meta itemprop=description content="Writing an interactive prompt to send HTTP requests"><meta itemprop=datePublished content="2022-05-23T00:00:00+00:00"><meta itemprop=dateModified content="2022-05-23T00:00:00+00:00"><meta itemprop=wordCount content="2310"><meta itemprop=image content="https://protiumx.dev/blog/cover.png"><meta itemprop=image content="https://protiumx.dev/blog/prompt.png"><meta itemprop=keywords content="rust,peg,pest,rest,terminal,"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://protiumx.dev/blog/cover.png"><meta name=twitter:title content="An HTTP request parser with rust and pest.rs"><meta name=twitter:description content="Writing an interactive prompt to send HTTP requests"><meta property="og:title" content="An HTTP request parser with rust and pest.rs"><meta property="og:description" content="Writing an interactive prompt to send HTTP requests"><meta property="og:type" content="article"><meta property="og:url" content="https://protiumx.dev/blog/posts/an-http-request-parser-with-rust-and-pest.rs/"><meta property="og:image" content="https://protiumx.dev/blog/cover.png"><meta property="og:image" content="https://protiumx.dev/blog/prompt.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-05-23T00:00:00+00:00"><meta property="article:modified_time" content="2022-05-23T00:00:00+00:00"><meta property="article:published_time" content="2022-05-23 00:00:00 +0000 UTC"></head><body><div class=container><header class=header><span class=header__inner><a href=/ style=text-decoration:none><div class=logo><span class=logo__mark>></span>
+<span class=logo__text>$ cat protiumx/blog</span>
+<span class=logo__cursor style=background-color:#8631b4></span></div></a><span class=header__right><nav class=menu><ul class=menu__inner><li><a href=https://protiumx.dev>About</a></li><li><a href=https://github.com/protiumx>Github</a></li><li><a href=/blog/posts/>Posts</a></li></ul></nav><span class=menu-trigger><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></span><span class="theme-toggle not-selectable"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 41c10.4934.0 19-8.5066 19-19C41 11.5066 32.4934 3 22 3 11.5066 3 3 11.5066 3 22s8.5066 19 19 19zM7 22C7 13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22z"/></svg></span></span></span></header><div class=content><main class=post><div class=post-info><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>11 minutes</p></div><article><h1 class=post-title><a href=https://protiumx.dev/blog/posts/an-http-request-parser-with-rust-and-pest.rs/>An HTTP request parser with rust and pest.rs</a></h1><div class=post-excerpt>Writing an interactive prompt to send HTTP requests</div><hr><aside id=toc><div class=toc-title>Table of Contents</div><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#preparation>Preparation</a><ul><li><a href=#request>Request</a></li><li><a href=#request-line>Request-Line</a></li><li><a href=#request-header>Request-Header</a></li><li><a href=#message-body>Message-Body</a></li></ul></li><li><a href=#pest>Pest</a></li><li><a href=#http-grammar>HTTP Grammar</a></li><li><a href=#the-http-file-syntax>The .http file syntax</a></li><li><a href=#parsing-http-files>Parsing http files</a></li><li><a href=#reqwest>reqwest</a></li><li><a href=#lazyness-kicks-in>Lazyness kicks in</a></li><li><a href=#unintroduction>Unintroduction</a></li></ul></nav></aside><hr><div class=post-content><h2 id=introduction>Introduction</h2><p>I happened to have learned about <a href=https://en.wikipedia.org/wiki/Parsing_expression_grammar>parsing expression grammars</a> a few days ago and got really excited about writing my own grammar.
+As I was missing this <a href=https://github.com/Huachao/vscode-restclient>VS Code extension</a> when working on <code>neovim</code>, an idea popped up:
+<strong>What if I write an HTTP grammar and an execute request from an interactive prompt?</strong></p><p>Preview:</p><p><img src=./preview.gif alt=preview></p><h2 id=preparation>Preparation</h2><p>For our grammar, we need to make sure we understand the HTTP standard defined <a href=https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html>here</a>.</p><pre tabindex=0><code>Request = Request-Line ; Section 5.1
+        *(( general-header        ; Section 4.5
+         | request-header         ; Section 5.3
+         | entity-header ) CRLF)  ; Section 7.1
+        CRLF
+        [ message-body ]          ; Section 4.3
+</code></pre><p>Let&rsquo;s breakout the definition</p><h3 id=request>Request</h3><p>A <code>Request</code> is conformed by a <code>Request-Line</code> optionally followed by <code>headers</code> and a new line (a <strong>Carriage Return</strong> and <strong>Line Feed</strong>) then another new line. After the <code>headers</code> we find the <code>message-body</code>.</p><h3 id=request-line>Request-Line</h3><pre tabindex=0><code>Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+</code></pre><p>Here we should fine a <code>Method</code> followed by a white space. Then the <code>Request-URI</code> followed by a white space. Finally the <code>HTTP-Version</code>.</p><p>An example of a request can be <code>GET http://www.w3.org/pub/WWW/TheProject.html HTTP/1.\r\n</code> (note the end of the line)</p><h3 id=request-header>Request-Header</h3><p>Defined as</p><pre tabindex=0><code>equest-header = Accept                   ; Section 14.1
+      | Accept-Charset           ; Section 14.2
+      | Accept-Encoding          ; Section 14.3
+      | Accept-Language          ; Section 14.4
+      | Authorization            ; Section 14.8
+      | Expect                   ; Section 14.20
+      | From                     ; Section 14.22
+      | Host                     ; Section 14.23
+      | If-Match                 ; Section 14.24
+      | If-Modified-Since        ; Section 14.25
+      | If-None-Match            ; Section 14.26
+      | If-Range                 ; Section 14.27
+      | If-Unmodified-Since      ; Section 14.28
+      | Max-Forwards             ; Section 14.31
+      | Proxy-Authorization      ; Section 14.34
+      | Range                    ; Section 14.35
+      | Referer                  ; Section 14.36
+      | TE                       ; Section 14.39
+      | User-Agent               ; Section 14.43
+</code></pre><p>let&rsquo;s open one of those sections to check the format.</p><pre tabindex=0><code>Authorization = &#34;Authorization&#34; &#34;:&#34; credentials
+</code></pre><p>Basically this header is the word <code>Authorization</code> followed by <code>:</code> and then the <code>credentials</code>.</p><h3 id=message-body>Message-Body</h3><pre tabindex=0><code>message-body = entity-body
+                    | &lt;entity-body encoded as per Transfer-Encoding&gt;
+</code></pre><p>For simplicity let&rsquo;s assume that the <code>body</code> can be <strong>anything</strong> that is not a request line nor a header.</p><p>Now we have enough information to write our http grammar, more specific a set of <strong>rules</strong>.</p><h2 id=pest>Pest</h2><p>To write our grammar we will use <a href=https://pest.rs/>pest</a>. From the website:</p><blockquote><p>pest is a general purpose parser written in Rust with a focus on <strong>accessibility</strong>, <strong>correctness</strong>, and <strong>performance</strong>. It uses <a href=https://en.wikipedia.org/wiki/Parsing_expression_grammar>parsing expression grammars (or PEG)</a> as input, which are similar in spirit to regular expressions, but which offer the enhanced expressivity needed to parse complex languages.</p></blockquote><p>Sounds great!</p><p>Pest has its <a href=https://pest.rs/book/grammars/syntax.html>own syntax</a> for writing grammar rules. A <strong>rule</strong> is defined as follows:</p><pre tabindex=0><code>my_rule = { ... }
+</code></pre><p>Let&rsquo;s create a new rule <code>my_rule= { "test" }</code>. This rule will match the word <code>test</code> inside an <strong>input</strong>. So if we want to parse a file that only contains &ldquo;test&rdquo; or new lines we need to define the shape of a line with the delimiters <code>SOI</code> and <code>EOI</code> (start and end of input respectively)</p><pre tabindex=0><code>testy_file = {
+    SOI
+    ~ (my_rule | NEWLINE)*
+    ~ EOI
+}
+</code></pre><p>Let&rsquo;s test this out in the online grammar editor:</p><p><img src=./pest-editor.png alt=editor></p><p>The parser has identified a <code>testy_file</code> that contains to matches for the rule <code>my_rule</code>. So far so good.</p><h2 id=http-grammar>HTTP Grammar</h2><p>Now we are ready for writing our grammar (are we?). We need to write this grammar as close as possible to the standard, since it&rsquo;s defined in a similar way, with <strong>rules</strong>. We can imagine something like this</p><pre tabindex=0><code>request = {	
+	request_line ~
+    headers? ~
+    NEWLINE ~
+    body?
+}
+</code></pre><p>Our <code>request</code> rule says: a <code>request_line</code> optionally followed by <code>headers</code> followed by a new line, then optionally followed by the <code>body</code>. With optionally I make reference to the <code>?</code> mark which is a repetition operator (those who are familiar with regex expressions should understand this right away) and means that something <code>can occur zero or one times</code>.
+For our <code>request_line</code> we will match the standard as follows:</p><pre tabindex=0><code>request_line = _{ method ~ &#34; &#34;+ ~ uri ~ &#34; &#34;+ ~ &#34;HTTP/&#34; ~ version ~ NEWLINE }
+</code></pre><p>We are talking about a <code>method</code> followed by a blank space then the <code>uri</code> then another blank space then the <code>http version</code> followed by a <code>NEWLINE</code>. <code>NEWLINE</code> is a pest built-in rule that matches <code>"\n" | "\r\n" | "\r"</code>.</p><p>Let&rsquo;s break the request line.</p><p>For <code>method</code> we just need to match any of the http methods defined in the standard</p><pre tabindex=0><code>Method = &#34;OPTIONS&#34;                ; Section 9.2
+        | &#34;GET&#34;                    ; Section 9.3
+        | &#34;HEAD&#34;                   ; Section 9.4
+        | &#34;POST&#34;                   ; Section 9.5
+        | &#34;PUT&#34;                    ; Section 9.6
+        | &#34;DELETE&#34;                 ; Section 9.7
+        | &#34;TRACE&#34;                  ; Section 9.8
+        | &#34;CONNECT&#34;                ; Section 9.9
+</code></pre><p>Therefore our method rule should be</p><pre tabindex=0><code>method = { (&#34;GET&#34; | &#34;DELETE&#34; | &#34;POST&#34; | &#34;PUT&#34; | ...) }
+</code></pre><p>Here our rule says: match the exact word <code>GET</code> or <code>DELETE</code> or &mldr; you get the idea.</p><p>Next, for simplicity purpuses, we will say that the <code>uri</code> is anything that is <strong>not</strong> a blank space</p><pre tabindex=0><code>uri = { (!whitespace ~ ANY)+ }
+whitespace = _{ &#34; &#34; | &#34;\t&#34; }
+</code></pre><p><strong>Note:</strong> here we also defined that the <code>white space</code> can be a space or a tab. Note that <code>_</code> means that the rule is <a href=https://pest.rs/book/grammars/syntax.html#silent-and-atomic-rules>silent</a>; it does not produce tokens.</p><p>The HTTP version goes like:</p><pre tabindex=0><code>version = { (ASCII_DIGIT | &#34;.&#34;)+ }
+</code></pre><p>Meaning: any digit or a dot character. In our <code>request_line</code> the version is defined as the word &ldquo;HTTP/&rdquo; followed by the <code>version</code>.</p><p>Finally, we require a <code>NEWLINE</code> at the end of our request line.</p><p>Let&rsquo;s test this out on the editor.</p><p><img src=./request-line.png alt="request line"></p><p>Perfect! Note that the <code>whitespace</code> rule does not produce a token, we only see <code>method</code>, <code>uri</code> and <code>version</code>. Let&rsquo;s continue with the headers.</p><pre tabindex=0><code>header = { header_name ~ &#34;:&#34; ~ whitespace ~ header_value ~ NEWLINE }
+header_name = { (!(&#34;:&#34; | NEWLINE) ~ ANY)+ }
+header_value = { (!NEWLINE ~ ANY)+ }
+</code></pre><p>In here we say that a <code>header_name</code> is anything except for <code>:</code> , because this character is a <strong>header separator</strong>, it delimits the header name. We also don&rsquo;t want a new line, we will see why bellow.
+The name is followed by the separator <code>:</code> and then 1 white space.
+The <code>header_value</code> is anything except for a <strong>new line</strong>, because the new line delimits a <code>header</code>. After the value we encounter a new line.</p><p>Let&rsquo;s test this again:</p><p><img src=./headers.png alt=headers></p><p>Here we can se that the parser matches 1 header as <code>{ header_name: "auth", header_value: "token" }</code>. Did you notice that it also say <code>headers > header</code> ? That is because we also want a rule that can matches a 1 or more <code>header</code> rules. We define this rule as:</p><pre tabindex=0><code>headers = { header+ }
+</code></pre><p>This way the pest parser will produce a token <code>headers</code> with a list of <code>header</code> matches.</p><p>Lastly the body:</p><pre tabindex=0><code>body = { ANY+ }
+</code></pre><p>The body is anything after the headers</p><p><img src=./body.png alt=body></p><p>So far our grammar can parse 1 request from the input. Coming back to the original idea for this post, we want to be able to parse multiple http requests from a file. But here we have a conflict because our <code>body</code> rule will match anything after the headers, and that anything can be another request.
+To solve this problem we need the help of a ✨ delimiter ✨</p><h2 id=the-http-file-syntax>The .http file syntax</h2><p>To delimit each http request in our file we will make use of 3 <code>#</code> symbols (as the VS Code rest client does).
+Let&rsquo;s go add this to our grammar:</p><pre tabindex=0><code>delimiter = { &#34;#&#34;{3} ~ NEWLINE+ }
+</code></pre><p>Our delimiter is exactly 3 number signs followed by 1 or more new lines. Then we can say that the <code>body</code> is anything except for a delimiter:</p><pre tabindex=0><code>body = { (!delimiter ~ ANY)+ }
+</code></pre><p>Let&rsquo;s test this:</p><p><img src=./multiple.png alt="multiple requests"></p><p>Nice! So finally we can define what our http file should look like:</p><pre tabindex=0><code>file = { SOI ~ (delimiter | request)* ~ EOI}
+</code></pre><p>Our http file is composed by delimiters or requests, 0 or more of them.
+We have completed our http grammar, now it&rsquo;s time to get <strong>rusty</strong></p><p><img src=./schwifty.jpeg alt="get schwifty"></p><h2 id=parsing-http-files>Parsing http files</h2><p>We will refer to <a href=https://pest.rs/book/examples/ini.html>this example</a> for setting up the base code</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>extern</span> <span style=color:#66d9ef>crate</span> pest;
+</span></span><span style=display:flex><span><span style=color:#75715e>#[macro_use]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>extern</span> <span style=color:#66d9ef>crate</span> pest_derive;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> pest::Parser;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[derive(Parser)]</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[grammar = </span><span style=color:#e6db74>&#34;grammar.pest&#34;</span><span style=color:#75715e>]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>HttpParser</span>;
+</span></span></code></pre></div><p>We will use the following file for testing</p><pre tabindex=0><code>GET https://protiumx.github.io HTTP/1.1
+authorization: token
+
+###
+
+POST https://rq-rust.free.beeceptor.com/api HTTP/1.1
+
+{
+  &#34;hello&#34;: &#34;hola&#34;
+}
+</code></pre><p><strong>Note:</strong> I set up a mock api in <a href=https://beeceptor.com/>https://beeceptor.com/</a>. It might not be available by the time you are reading this. But you can use any endpoint that accepts <strong>POST</strong>.</p><p>Let&rsquo;s go ahead an parse the file</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> unparsed_file <span style=color:#f92672>=</span> fs::read_to_string(<span style=color:#e6db74>&#34;test.http&#34;</span>).expect(<span style=color:#e6db74>&#34;cannot read file&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> file <span style=color:#f92672>=</span> INIParser::parse(Rule::file, <span style=color:#f92672>&amp;</span>unparsed_file)
+</span></span><span style=display:flex><span>        .expect(<span style=color:#e6db74>&#34;unsuccessful parse&#34;</span>) <span style=color:#75715e>// unwrap the parse result
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        .next().unwrap(); <span style=color:#75715e>// get and unwrap the `file` rule; never fails
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>		println!(<span style=color:#e6db74>&#34;{:#?}&#34;</span>, file);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>we get:</p><pre tabindex=0><code>Pair {
+    rule: file,
+    span: Span {
+        str: &#34;GET https://protiumx.github.io HTTP/1.1\nauthorzation: token\n\n###\n\nPOST https://rq-rust.free.beeceptor.com/api HTTP/1.1\n\n{\n  \&#34;hello\&#34;: \&#34;hola\&#34;\n}\n&#34;,
+        start: 0,
+        end: 142,
+    },
+    inner: [
+        Pair {
+            rule: request,
+            span: Span {
+                str: &#34;GET https://protiumx.github.io HTTP/1.1\nauthorzation: token\n\n&#34;,
+                start: 0,
+                end: 61,
+            },
+            inner: [
+                Pair {
+                    rule: method,
+                    span: Span {
+                        str: &#34;GET&#34;,
+                        start: 0,
+                        end: 3,
+                    },
+                    inner: [],
+                },
+...
+</code></pre><p>The <code>Pair</code> struct has a pretty clear structure and we could use to print each inner <code>Pair</code>. But we want to get rusty so we will put some effort.</p><p>We will define an <code>HttpFile</code> struct. This struct will contain a vector of <code>HttpRequest</code>.
+Let&rsquo;s define them:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>use</span> std::collections::HashMap;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[derive(Debug)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>HttpMethod</span> {
+</span></span><span style=display:flex><span>    Get,
+</span></span><span style=display:flex><span>    Post,
+</span></span><span style=display:flex><span>    Put,
+</span></span><span style=display:flex><span>    Delete,
+</span></span><span style=display:flex><span>  	<span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[derive(Debug)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>HttpRequest</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> method: <span style=color:#a6e22e>HttpMethod</span>,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> url: String,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> version: String,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> headers: <span style=color:#a6e22e>HashMap</span><span style=color:#f92672>&lt;</span>String, String<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> body: String,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#[derive(Debug)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>HttpFile</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> requests: Vec<span style=color:#f92672>&lt;</span>HttpRequest<span style=color:#f92672>&gt;</span>,
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>And to get even more rusty we will implement the <code>TryFrom</code> trait to each struct. Let&rsquo;s implement it for the <code>HttpFile</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>i</span><span style=color:#f92672>&gt;</span> TryFrom<span style=color:#f92672>&lt;</span>Pair<span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>i</span>, Rule<span style=color:#f92672>&gt;&gt;</span> <span style=color:#66d9ef>for</span> HttpFile {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> Error<span style=color:#f92672>&lt;</span>Rule<span style=color:#f92672>&gt;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(pair: <span style=color:#a6e22e>Pair</span><span style=color:#f92672>&lt;</span>Rule<span style=color:#f92672>&gt;</span>) -&gt; Result<span style=color:#f92672>&lt;</span>Self, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> iterator <span style=color:#f92672>=</span> pair.into_inner();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> requests <span style=color:#f92672>=</span> vec![];
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> item <span style=color:#66d9ef>in</span> iterator {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>match</span> item.as_rule() {
+</span></span><span style=display:flex><span>                Rule::EOI <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                Rule::request <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                    requests.push(item.try_into()<span style=color:#f92672>?</span>);
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                _ <span style=color:#f92672>=&gt;</span> {}
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        Ok(Self { requests })
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><strong>Note:</strong> <code>Pair&lt;'i, Rule></code> has the lifetime of the <code>input</code>.
+As we know, the <code>file</code> rule can contain 0 or more of (delimiter | request). This means that in its content we can find: delimiter, request or End of File.
+Here we will <strong>try</strong> to parse each request, so we need the <code>TryFrom</code> trait for the <code>HttpRequest</code> struct</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>i</span><span style=color:#f92672>&gt;</span> TryFrom<span style=color:#f92672>&lt;</span>Pair<span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>i</span>, Rule<span style=color:#f92672>&gt;&gt;</span> <span style=color:#66d9ef>for</span> HttpRequest {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Error</span> <span style=color:#f92672>=</span> Error<span style=color:#f92672>&lt;</span>Rule<span style=color:#f92672>&gt;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>try_from</span>(pair: <span style=color:#a6e22e>Pair</span><span style=color:#f92672>&lt;&#39;</span><span style=color:#a6e22e>i</span>, Rule<span style=color:#f92672>&gt;</span>) -&gt; Result<span style=color:#f92672>&lt;</span>Self, Self::Error<span style=color:#f92672>&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> iterator <span style=color:#f92672>=</span> pair.into_inner();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> ret <span style=color:#f92672>=</span> Self {
+</span></span><span style=display:flex><span>            method: <span style=color:#a6e22e>iterator</span>.next().unwrap().try_into()<span style=color:#f92672>?</span>,
+</span></span><span style=display:flex><span>            url: <span style=color:#a6e22e>iterator</span>.next().unwrap().as_str().to_string(),
+</span></span><span style=display:flex><span>            version: <span style=color:#a6e22e>iterator</span>.next().unwrap().as_str().to_string(),
+</span></span><span style=display:flex><span>            headers: <span style=color:#a6e22e>HashMap</span>::new(),
+</span></span><span style=display:flex><span>            body: String::new(),
+</span></span><span style=display:flex><span>        };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> item <span style=color:#66d9ef>in</span> iterator {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>match</span> item.as_rule() {
+</span></span><span style=display:flex><span>                Rule::headers <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                    ret.parse_headers(item.into_inner());
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                Rule::body <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                    ret.body <span style=color:#f92672>=</span> item.as_str().to_string();
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                _ <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>                    unreachable!();
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        Ok(ret)
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p><img src=./egghead.jpeg alt=egghead></p><p>Each <code>request</code> can have 5 inner matches: method, url, version, headers and body.
+The first 3 do not have inner rules, so we can just extract them as <code>&str</code>. After this, the iterator can only have <code>headers</code> or <code>body</code> pairs. For the <code>headers</code> we perform a similar operation:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#66d9ef>impl</span> HttpRequest {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>parse_headers</span>(<span style=color:#f92672>&amp;</span><span style=color:#66d9ef>mut</span> self, pairs: <span style=color:#a6e22e>Pairs</span><span style=color:#f92672>&lt;</span>Rule<span style=color:#f92672>&gt;</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> item <span style=color:#66d9ef>in</span> pairs {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> kv <span style=color:#f92672>=</span> item.into_inner();
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> key <span style=color:#f92672>=</span> kv.next().unwrap().as_str().to_string();
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>let</span> value <span style=color:#f92672>=</span> kv.next().unwrap().as_str().to_string();
+</span></span><span style=display:flex><span>            self.headers.insert(key, value);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Grapes! We are pretty much done with the parser. Now let&rsquo;s use the parsed content to make the requests.</p><h2 id=reqwest>reqwest</h2><p>After a quick check of the available rust http client libraries I opted for <a href=https://crates.io/crates/reqwest>reqwest</a>. It has a pretty simple API and it seems to be among the most used libraries for this matters. But I&rsquo;m a bit concerned about all its dependencies so I might try <a href=https://github.com/algesten/ureq>ureq</a> later.</p><p>For this part I just followed the examples on the docs website and ended up with this code:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span><span style=color:#75715e>#[derive(Default)]</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>HttpClient</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> client: <span style=color:#a6e22e>reqwest</span>::blocking::Client,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>impl</span> HttpClient {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>new</span>() -&gt; <span style=color:#a6e22e>Self</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> <span style=color:#66d9ef>mut</span> headers <span style=color:#f92672>=</span> header::HeaderMap::new();
+</span></span><span style=display:flex><span>        headers.insert(
+</span></span><span style=display:flex><span>            header::CONTENT_TYPE,
+</span></span><span style=display:flex><span>            header::HeaderValue::from_static(<span style=color:#e6db74>&#34;application/json&#34;</span>),
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>        headers.insert(
+</span></span><span style=display:flex><span>            header::ACCEPT,
+</span></span><span style=display:flex><span>            header::HeaderValue::from_static(<span style=color:#e6db74>&#34;application/json&#34;</span>),
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> client <span style=color:#f92672>=</span> reqwest::blocking::Client::builder()
+</span></span><span style=display:flex><span>            .timeout(Duration::from_secs(<span style=color:#ae81ff>10</span>))
+</span></span><span style=display:flex><span>            .default_headers(headers)
+</span></span><span style=display:flex><span>            .no_gzip()
+</span></span><span style=display:flex><span>            .build()
+</span></span><span style=display:flex><span>            .unwrap();
+</span></span><span style=display:flex><span>        HttpClient { client }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>pub</span> <span style=color:#66d9ef>fn</span> <span style=color:#a6e22e>execute</span>(<span style=color:#f92672>&amp;</span>self, req: <span style=color:#66d9ef>&amp;</span><span style=color:#a6e22e>HttpRequest</span>) -&gt; Result<span style=color:#f92672>&lt;</span>(), Box<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>dyn</span> std::error::Error<span style=color:#f92672>&gt;&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> request <span style=color:#f92672>=</span> self
+</span></span><span style=display:flex><span>            .client
+</span></span><span style=display:flex><span>            .request(Method::from_str(req.method.to_string().as_str())<span style=color:#f92672>?</span>, <span style=color:#f92672>&amp;</span>req.url);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> headers: <span style=color:#a6e22e>header</span>::HeaderMap <span style=color:#f92672>=</span> (<span style=color:#f92672>&amp;</span>req.headers).try_into()<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> body <span style=color:#f92672>=</span> req.body.clone();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>let</span> res <span style=color:#f92672>=</span> request.headers(headers).body(body).send()<span style=color:#f92672>?</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        println!(<span style=color:#e6db74>&#34;{}\n&#34;</span>, res.text()<span style=color:#f92672>?</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        Ok(())
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>What we can see in here:</p><ul><li>Use the <code>ClientBuilder</code> to add some default headers and config for the request</li><li>Parse our <code>HttpMethod</code> into <code>reqwest::Method</code>. <strong>Note:</strong> <code>HttpMethod</code> implements the <code>Display</code> trait.</li><li>Parse our <code>HashMap&lt;String, String</code> of headers into <code>reqwest::header::HeaderMap</code>. This is possible because it implements the <code>TryFrom&lt;HashMap&lt;String, String>></code> trait.</li><li>Finally clone the body and send the request. We output the body of the request as <code>text</code> (this consumes the body)</li></ul><p><strong>Note:</strong> We are not trimming the body, perhaps we should.</p><p>No we are ready for the last part: the interactive prompt</p><h2 id=lazyness-kicks-in>Lazyness kicks in</h2><p>At this point I felt a bit lazy to implement the prompt so I searched for existing solutions, one of them being <a href=https://github.com/mikaelmello/inquire>inquire</a>. It has a pretty straight forward API, so to show an interactive select we just need this lines:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-rust data-lang=rust><span style=display:flex><span>    <span style=color:#66d9ef>let</span> http_file <span style=color:#f92672>=</span> parse(<span style=color:#f92672>&amp;</span>file_content).unwrap();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> request <span style=color:#f92672>=</span> Select::new(<span style=color:#e6db74>&#34;Select requests to execute:&#34;</span>, http_file.requests)
+</span></span><span style=display:flex><span>        .prompt()
+</span></span><span style=display:flex><span>        .unwrap();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> client <span style=color:#f92672>=</span> HttpClient::new();
+</span></span><span style=display:flex><span>    client.execute(<span style=color:#f92672>&amp;</span>request)<span style=color:#f92672>?</span>;
+</span></span></code></pre></div><p>Note that the <code>HttpRequest</code> implements the <code>Display</code> trait.</p><p>The result:</p><p><img src=./prompt.png alt=prompt></p><p>Gorgeous.</p><h2 id=unintroduction>Unintroduction</h2><p>This project turned out to be quite fun! I ended up naming it <code>rq</code> and you can see its source <a href=https://github.com/protiumx/rq/>here</a></p><p>My goal is to have a full interactive prompt that allows you to execute many request without existing the prompt mode.
+If you would like to collaborate I have created a few TODO cards <a href=https://github.com/protiumx/rq/projects/1>here</a>.</p><p>That&rsquo;s it. Thanks for reading 👽</p><p>Others posts:</p><p>Related articles:</p><ul><li><a href=https://protiumx.dev/blog/posts/publish-your-blog-articles-everywhere-with-this-github-action/>Publish your blog articles everywhere with this github action</a></li><li><a href=https://dev.to/protium/coding-problems-tdd-and-ci-282n>Coding Problems, TDD, and CI</a></li><li><a href=https://dev.to/protium/your-new-pretty-and-minimalist-resume-with-latex-421j>Your new pretty and minimalist resume with LaTex</a></li></ul></div></article><hr><div class=post-info><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://protiumx.dev/blog/tags/rust/>rust</a></span>
+<span class=tag><a href=https://protiumx.dev/blog/tags/peg/>peg</a></span>
+<span class=tag><a href=https://protiumx.dev/blog/tags/pest/>pest</a></span>
+<span class=tag><a href=https://protiumx.dev/blog/tags/rest/>rest</a></span>
+<span class=tag><a href=https://protiumx.dev/blog/tags/terminal/>terminal</a></span></p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>2310 Words</p><p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2022-2323-05</p></div><hr><div class=sharing-buttons><a class=resp-sharing-button__link href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fprotiumx.dev%2fblog%2fposts%2fan-http-request-parser-with-rust-and-pest.rs%2f" target=_blank rel=noopener aria-label title="Share on facebook"><div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden=true class="resp-sharing-button__icon resp-sharing-button__icon--solid"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></div></div></a><a class=resp-sharing-button__link href="https://twitter.com/intent/tweet/?url=https%3a%2f%2fprotiumx.dev%2fblog%2fposts%2fan-http-request-parser-with-rust-and-pest.rs%2f" target=_blank rel=noopener aria-label title="Share on twitter"><div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small"><div aria-hidden=true class="resp-sharing-button__icon resp-sharing-button__icon--solid"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9.0 01-3.14 1.53 4.48 4.48.0 00-7.86 3v1A10.66 10.66.0 013 4s-4 9 5 13a11.64 11.64.0 01-7 2c9 5 20 0 20-11.5a4.5 4.5.0 00-.08-.83A7.72 7.72.0 0023 3z"/></svg></div></div></a><a class=resp-sharing-button__link href="https://www.linkedin.com/shareArticle?mini=true&url=https%3a%2f%2fprotiumx.dev%2fblog%2fposts%2fan-http-request-parser-with-rust-and-pest.rs%2f&title=An%20HTTP%20request%20parser%20with%20rust%20and%20pest.rs&summary=An%20HTTP%20request%20parser%20with%20rust%20and%20pest.rs&source=https%3a%2f%2fprotiumx.dev%2fblog%2fposts%2fan-http-request-parser-with-rust-and-pest.rs%2f" target=_blank rel=noopener aria-label title="Share on linkedin"><div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden=true class="resp-sharing-button__icon resp-sharing-button__icon--solid"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div></div></a><a class=resp-sharing-button__link href="https://reddit.com/submit/?url=https%3a%2f%2fprotiumx.dev%2fblog%2fposts%2fan-http-request-parser-with-rust-and-pest.rs%2f&resubmit=true&title=An%20HTTP%20request%20parser%20with%20rust%20and%20pest.rs" target=_blank rel=noopener aria-label title="Share on reddit"><div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden=true class="resp-sharing-button__icon resp-sharing-button__icon--solid"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentcolor" stroke="none"><path d="M12 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm5.01 4.744c.688.0 1.25.561 1.25 1.249a1.25 1.25.0 01-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968.0 1.754.786 1.754 1.754.0.716-.435 1.333-1.01 1.614a3.111 3.111.0 01.042.52c0 2.694-3.13 4.87-7.004 4.87s-7.004-2.176-7.004-4.87c0-.183.015-.366.043-.534A1.748 1.748.0 014.028 12c0-.968.786-1.754 1.754-1.754.463.0.898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342.0 01.14-.197.35.35.0 01.238-.042l2.906.617a1.214 1.214.0 011.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687.0 1.248-.561 1.248-1.249S9.937 12 9.249 12zm5.5.0c-.687.0-1.248.561-1.248 1.25.0.687.561 1.248 1.249 1.248S16 13.937 16 13.249c0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327.0 00-.231.094.33.33.0 000 .463c.842.842 2.484.913 2.961.913s2.105-.056 2.961-.913a.361.361.0 00.029-.463.33.33.0 00-.464.0c-.547.533-1.684.73-2.512.73-.828.0-1.979-.196-2.512-.73a.326.326.0 00-.232-.095z"/></svg></div></div></a></div><div class=pagination><div class=pagination__buttons><span class="button previous"><a href=https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/><span class=button__icon>←</span>
+<span class=button__text>My profile website is now a terminal</span></a></span>
+<span class="button next"><a href=https://protiumx.dev/blog/posts/automate-an-articles-section-in-your-github.io-page/><span class=button__text>Automate an articles section in your github.io page</span>
+<span class=button__icon>→</span></a></span></div></div></main></div><footer class=footer><div class=footer__inner><div class=footer__content><span>&copy; 2022</span>
+<span><a href=https://protiumx.dev/blog/>Brian Mayo</a></span>
+<span><a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></span>
+<span><a href=https://protiumx.dev/blog/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a></span></div></div></footer></div><script type=text/javascript src=/blog/bundle.min.a2c5b062c87998f04d1b5dfb6a89a1b2d79786c21d0cb63a05e8a2082984b64b77d80955e3b97eab17273775162ba372511b711fea2f7608f216e68a67bb22d6.js integrity="sha512-osWwYsh5mPBNG137aomhsteXhsIdDLY6BeiiCCmEtkt32AlV47l+qxcnN3UWK6NyURtxH+ovdgjyFuaKZ7si1g=="></script></body></html>
