@@ -1,4 +1,4 @@
-baseURL = "https://protiumx.github.io/blog/"
+baseURL = "https://protiumx.dev/blog/"
 languageCode = "en-us"
 title = "protiumx blog"
 theme = "hello-friend-ng"
@@ -63,7 +63,7 @@ PygmentsStyle = "monokai"
   [[menu.main]]
     identifier = "about"
     name       = "About"
-    url        = "https://protiumx.github.io"
+    url        = "https://protiumx.dev"
   [[menu.main]]
     identifier = "github"
     name       = "Github"
