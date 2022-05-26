@@ -229,9 +229,13 @@ I'll problaly add more commands in the future and also implement `streams` , jus
 What command would you add to your **profile terminal**?
 Go have some fun with it: https://protiumx.dev
 
-## Update:
+## Update 1:
 I have refactored the project structure to improve readability and make it more generic.
 It also loads your command history from the local storage. All the changes can be seen here: https://github.com/protiumx/protiumx.github.io/pull/1
+
+## Update 2:
+- rm supports glob pattern
+- terminal supports `!!` (run last command) and `ctrl + p` (print last command)
 
 Other articles:
 
