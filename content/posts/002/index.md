@@ -10,7 +10,9 @@ tags:
   - typescript
   - blogging
   - blogpub
-
+_build:
+ list: false
+ render: false
 published: true
 ---
 Hey everyone, this is just a small update on the [blogpub](https://github.com/marketplace/actions/blogpub) action.
