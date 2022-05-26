@@ -229,6 +229,10 @@ I'll problaly add more commands in the future and also implement `streams` , jus
 What command would you add to your **profile terminal**?
 Go have some fun with it: https://protiumx.dev
 
+## Update:
+I have refactored the project structure to improve readability and make it more generic.
+It also loads your command history from the local storage. All the changes can be seen here: https://github.com/protiumx/protiumx.github.io/pull/1
+
 Other articles:
 
 - [Publish your blog articles everywhere with this github action](https://protiumx.dev/blog/publish-your-blog-articles-with-this-github-action/)

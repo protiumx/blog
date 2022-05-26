@@ -6,6 +6,11 @@ on:
       - 'main'
     paths:
       - 'content/posts/**'
+
+concurrency:
+  cancel-in-progress: true
+  group: publish-${{ github.head_ref || github.ref }}
+
 jobs:
   publish:
     name: publish new article
