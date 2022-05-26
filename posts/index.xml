@@ -148,9 +148,14 @@ For this I found this amazing <a href="https://cataas.com/#/">rest API</a></p>
 I&rsquo;ll problaly add more commands in the future and also implement <code>streams</code> , just for fun.</p>
 <p>What command would you add to your <strong>profile terminal</strong>?
 Go have some fun with it: <a href="https://protiumx.dev">https://protiumx.dev</a></p>
-<h2 id="update">Update:</h2>
+<h2 id="update-1">Update 1:</h2>
 <p>I have refactored the project structure to improve readability and make it more generic.
 It also loads your command history from the local storage. All the changes can be seen here: <a href="https://github.com/protiumx/protiumx.github.io/pull/1">https://github.com/protiumx/protiumx.github.io/pull/1</a></p>
+<h2 id="update-2">Update 2:</h2>
+<ul>
+<li>rm supports glob pattern</li>
+<li>terminal supports <code>!!</code> (run last command) and <code>ctrl + p</code> (print last command)</li>
+</ul>
 <p>Other articles:</p>
 <ul>
 <li><a href="https://protiumx.dev/blog/publish-your-blog-articles-with-this-github-action/">Publish your blog articles everywhere with this github action</a></li>
