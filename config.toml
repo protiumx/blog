@@ -17,7 +17,7 @@ PygmentsStyle = "monokai"
   name = "Brian Mayo"
 
 [permalinks]
-  posts = "/posts/:title/"
+  posts = "/:title/"
 
 [params]
   dateform        = "Jan 2, 2006"
