@@ -239,7 +239,7 @@ It also loads your command history from the local storage. All the changes can b
 
 Other articles:
 
-- [Publish your blog articles everywhere with this github action](https://protiumx.dev/blog/publish-your-blog-articles-with-this-github-action/)
-- [An HTTP request parser with rust and pest.rs](https://protiumx.dev/blog/an-http-request-parser-with-rust-and-pest-rs/)
+- [Publish your blog articles everywhere with this github action](https://protiumx.dev/blog/posts/publish-your-blog-articles-everywhere-with-this-github-action/)
+- [An HTTP request parser with rust and pest.rs](https://protiumx.dev/blog/posts/an-http-request-parser-with-rust-and-pest.rs/)
 
 :alien:
