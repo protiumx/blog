@@ -37,8 +37,8 @@ PygmentsStyle = "monokai"
 
   # Metadata mostly used in document's head
   description = "protiumx dev blog"
-  keywords = "blog, software, engineering, rust, golang"
-  images = [""]
+  keywords = "protium, protiumx, brian mayo, blog, software, engineering, rust, golang, typescript, javascript, development"
+  images = ["./static/android-chrome-512x512.png"]
 
 [params.footer]
   trademark = true
@@ -70,16 +70,17 @@ PygmentsStyle = "monokai"
 [menu]  
   [[menu.main]]
     identifier = "posts"
-    name       = "Posts"
+    name       = "posts"
     url        = "posts/"
   [[menu.main]]
     identifier = "about"
-    name       = "About"
+    name       = "about"
     url        = "https://protiumx.dev"
   [[menu.main]]
     identifier = "github"
-    name       = "Github"
+    name       = "github"
     url        = "https://github.com/protiumx"
+    target = "_blank"
 
 [languages]
   [languages.en]   
