@@ -1,4 +1,221 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on protiumx blog</title><link>https://protiumx.dev/blog/posts/</link><description>Recent content in Posts on protiumx blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Wed, 25 May 2022 11:42:13 +0200</lastBuildDate><atom:link href="https://protiumx.dev/blog/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>My profile website is now a terminal</title><link>https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/</link><pubDate>Wed, 25 May 2022 11:42:13 +0200</pubDate><guid>https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/</guid><description>When I was younger I used to think that my profile website would be a really cool, fully featured website, with shiny colors and animations; built with the latest cutting edge frontend technology&amp;hellip; Turns out that the older I get the more I prefer a simple terminal. No UI, just text and commands.
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on protiumx blog</title><link>https://protiumx.dev/blog/posts/</link><description>Recent content in Posts on protiumx blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Thu, 02 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://protiumx.dev/blog/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Creating a Text-based UI with rust</title><link>https://protiumx.dev/blog/posts/creating-a-text-based-ui-with-rust/</link><pubDate>Thu, 02 Jun 2022 00:00:00 +0000</pubDate><guid>https://protiumx.dev/blog/posts/creating-a-text-based-ui-with-rust/</guid><description>Intro Continuing with my last project rq, I recently started to work on this project card: Implement interactive prompt. Let&amp;rsquo;s have a look how can we implement a text-based UI with rust.
+The ANSI Standard Before we dive into the wonderful world of terminal emulators and text-based interfaces, we need to understand what the ANSI escape sequences are:
+ANSI escape sequences are a standard for in-band signaling to control cursor location, color, font styling, and other options on video text terminals and terminal emulators.</description><content type="html"><![CDATA[<h2 id="intro">Intro</h2>
+<p>Continuing with my last project <a href="https://github.com/protiumx/rq">rq</a>, I recently started to work on
+this project card: <a href="https://github.com/protiumx/rq/projects/1#card-82259239">Implement interactive prompt</a>.
+Let&rsquo;s have a look how can we implement a <strong>text-based UI</strong> with <code>rust</code>.</p>
+<h2 id="the-ansi-standard">The ANSI Standard</h2>
+<p>Before we dive into the wonderful world of terminal emulators and text-based interfaces,
+we need to understand what the <strong>ANSI escape sequences</strong> are:</p>
+<blockquote>
+<p>ANSI escape sequences are a standard for in-band signaling to control cursor location, color, font styling, and other options on video text terminals and terminal emulators.</p>
+<p>Source: <a href="https://en.wikipedia.org/wiki/ANSI_escape_code">https://en.wikipedia.org/wiki/ANSI_escape_code</a></p>
+</blockquote>
+<p>By using ANSI sequences we can tell the terminal emulator how to render text, change the cursor position,
+clear the screen, etc. In my last <a href="https://dev.to/protium/my-profile-website-is-now-a-terminal-2j57">post</a>
+I used these sequences to implement a very basic shell for my <a href="https://protiumx.dev">profile website</a>.</p>
+<p>Let&rsquo;s see some examples. Head to your favorite terminal emulator (I use <a href="https://sw.kovidgoyal.net/kitty/">kitty</a>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;\x1b[35;47mANSI? \x1b[0m\x1b[1;32mSI&#34;</span>
+</span></span></code></pre></div><p><img src="./ansi.png" alt="echo ANSI"></p>
+<p>Analysis:</p>
+<ul>
+<li><code>\x1b</code>: this is the hexadecimal for <code>ESC</code> (escape). It starts the escape sequence</li>
+<li><code>[</code>: is the <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#CSIsection">control sequence introducer</a></li>
+<li><code>35;47m</code>: the SGR (Select Graphic Rendition) where <code>35</code> sets the <code>foreground</code> color to magenta and
+<code>47</code> sets the <code>background</code> to white. <code>m</code> is the final character specified by the standard</li>
+<li><code>\x1b[0m</code>: it&rsquo;s a special sequence to reset or turn all attributes off</li>
+<li><code>\x1b[1;32m</code>: Sets foreground to green and add the <code>bold</code> attribute</li>
+</ul>
+<p>Lets try this in rust:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span>println!(<span style="color:#e6db74">&#34;\x1b[35;47mANSI? \x1b[0m\x1b[1;32mSI&#34;</span>);
+</span></span></code></pre></div><p>It should have the same result as with the <code>echo</code> command above.</p>
+<p>Another example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span>println!(<span style="color:#e6db74">&#34;\x1b[2J&#34;</span>);
+</span></span></code></pre></div><p>According to the standard <code>[2J</code> erases entire display.</p>
+<h2 id="designing-the-text-based-interface">Designing the text-based interface</h2>
+<p>As a loyal user of (neo)vim, I love the concept of buffers. I want my app to have 2 buffers,
+one for the list of HTTP requests and one for the current response:</p>
+<p><img src="./design.jpg" alt="design preview"></p>
+<p>Let&rsquo;s start from scratch. To enter into the &ldquo;interactive&rdquo; mode, we need to clear the whole screen.
+For that we will use the following escape sequences:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span>println!(<span style="color:#e6db74">&#34;\r\x1b[2J\r\x1b[H&#34;</span>);
+</span></span></code></pre></div><p><img src="https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif" alt="wut"></p>
+<ol>
+<li><code>\r</code>, carriage return. We go all the way to the left</li>
+<li>As explained before, <code>[2J</code> clears the entire screen</li>
+<li><code>[H</code> moves the cursor to <code>home</code>, or the corner top-left of the terminal (col 1, row 1).</li>
+</ol>
+<p>Nice, an empty screen.
+Next I want to draw the requests the program loaded  from the <code>http</code> file
+(for context: I have published this <a href="https://protiumx.dev/blog/posts/an-http-request-parser-with-rust-and-pest.rs/">article</a>
+about how to parse HTTP request with rust). Based on the design, the selected request should print the
+HTTP method in green, URL in white and body in orange. If the request is selected, the whole request line should be green.
+Let&rsquo;s write a helper function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">draw_request</span>(req: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">HttpRequest</span>) -&gt; String {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> request_line <span style="color:#f92672">=</span> format!(<span style="color:#e6db74">&#34;{} {} HTTP/{}&#34;</span>, colorize(Color::Green, req.method), req.url, req.version);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> <span style="color:#f92672">!</span>req.header.is_empty() {
+</span></span><span style="display:flex;"><span>    request_line <span style="color:#f92672">=</span> format!(<span style="color:#e6db74">&#34;{}\r\n{:?}\r\n&#34;</span>, request_line, req.headers);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> <span style="color:#f92672">!</span>req.body.is_empty() {
+</span></span><span style="display:flex;"><span>    request_line <span style="color:#f92672">=</span> format!(<span style="color:#e6db74">&#34;{}\n{}&#34;</span>, request_line, colorize(Color::Orange, req.body.as_str()));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If you followed along my last post, you may have an idea of what the <code>colorize</code> function looks like.</p>
+<p>Now we are able to print all the request. Since we will use <code>&gt;</code> to visually mark which request is
+selected, we need to cater some space for it, hence we will print two empty spaces before each request start:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> req <span style="color:#66d9ef">in</span> http_file.requests {
+</span></span><span style="display:flex;"><span>  println!(<span style="color:#e6db74">&#34;  {}\n&#34;</span>, draw(<span style="color:#f92672">&amp;</span>req));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// go home 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>println!(<span style="color:#e6db74">&#34;\x1b[H&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// print the cursor &gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>print!(<span style="color:#e6db74">&#34;\x1b[32m&gt;&#34;</span>);
+</span></span></code></pre></div><p>Results:
+<img src="./request.png" alt="print request"></p>
+<h2 id="user-interaction">User interaction</h2>
+<p>The user should be able to navigate between requests with the <strong>arrow keys</strong>. To achieve this we will need:</p>
+<ul>
+<li>Track the current cursor position (column and row)</li>
+<li>Move the cursor down or up according to the user input</li>
+<li>Redraw the interface (clean the screen and draw)</li>
+</ul>
+<p>We can compare this flow to how a game engine works: we evaluate changes and use the engine to draw the game
+in its current state.</p>
+<p>Since I want to finish this project in less than a month, I have decided to take a look at the different
+options in <code>rust</code> for building a <code>TUI</code>. There are a few options that I can use as a TUI &ldquo;engine&rdquo;.</p>
+<p>I opted for <a href="https://github.com/fdehau/tui-rs/">tui-rs</a> which is being used by some of my favorite
+terminal apps like <a href="https://github.com/ClementTsang/bottom">bottom</a>. I headed over the <a href="https://github.com/fdehau/tui-rs/tree/master/examples">examples</a>
+and used the <code>list</code> example as a base.</p>
+<p>After a small refactor:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">ui</span><span style="color:#f92672">&lt;</span>B: <span style="color:#a6e22e">Backend</span><span style="color:#f92672">&gt;</span>(f: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> Frame<span style="color:#f92672">&lt;</span>B<span style="color:#f92672">&gt;</span>, app: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> App) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Split the screen into 2 vertical portions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">let</span> chunks <span style="color:#f92672">=</span> Layout::default()
+</span></span><span style="display:flex;"><span>      .direction(Direction::Horizontal)
+</span></span><span style="display:flex;"><span>      .constraints([Constraint::Percentage(<span style="color:#ae81ff">50</span>), Constraint::Percentage(<span style="color:#ae81ff">50</span>)].as_ref())
+</span></span><span style="display:flex;"><span>      .split(f.size());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> items: Vec<span style="color:#f92672">&lt;</span>ListItem<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> app
+</span></span><span style="display:flex;"><span>      .requests
+</span></span><span style="display:flex;"><span>      .iter()
+</span></span><span style="display:flex;"><span>      .map(<span style="color:#f92672">|</span>req<span style="color:#f92672">|</span> ListItem::new(draw_request(req)))
+</span></span><span style="display:flex;"><span>      .collect();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> list_block <span style="color:#f92672">=</span> Block::default().borders(Borders::ALL).title(<span style="color:#e6db74">&#34;Requests&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> list <span style="color:#f92672">=</span> List::new(items)
+</span></span><span style="display:flex;"><span>      .highlight_style(
+</span></span><span style="display:flex;"><span>          Style::default()
+</span></span><span style="display:flex;"><span>              .add_modifier(Modifier::BOLD)
+</span></span><span style="display:flex;"><span>              .fg(Color::Green),
+</span></span><span style="display:flex;"><span>      )
+</span></span><span style="display:flex;"><span>      .highlight_symbol(<span style="color:#e6db74">&#34;&gt; &#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  f.render_stateful_widget(list.block(list_block), chunks[<span style="color:#ae81ff">0</span>], <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> app.list);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>So we are at the same point as when using ANSI escape sequences to render the UI.
+This time we can easily implement a key handler and deal with the user interaction:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#66d9ef">match</span> event::read()<span style="color:#f92672">?</span> {
+</span></span><span style="display:flex;"><span>    Event::Key(key) <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">match</span> key.code {
+</span></span><span style="display:flex;"><span>        KeyCode::Down <span style="color:#f92672">=&gt;</span> app.next(),
+</span></span><span style="display:flex;"><span>        KeyCode::Up <span style="color:#f92672">=&gt;</span> app.previous(),
+</span></span><span style="display:flex;"><span>        _ <span style="color:#f92672">=&gt;</span> {}
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>where <code>app</code> is an instance of the <code>App</code> struct:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">App</span> {
+</span></span><span style="display:flex;"><span>    list: <span style="color:#a6e22e">ListState</span>, <span style="color:#75715e">// from tui-rs
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    requests: Vec<span style="color:#f92672">&lt;</span>HttpRequest<span style="color:#f92672">&gt;</span>,
+</span></span><span style="display:flex;"><span>    response_buffer: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> App {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">next</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> i <span style="color:#f92672">=</span> self.list.selected().unwrap() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> i <span style="color:#f92672">&gt;=</span> self.requests.len() {
+</span></span><span style="display:flex;"><span>            i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self.list.select(Some(i));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">previous</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> i <span style="color:#f92672">=</span> self.list.selected().unwrap();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>            i <span style="color:#f92672">=</span> self.requests.len() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            i <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        self.list.select(Some(i));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Sweet! Now it is possible to navigate between requests:
+<img src="./navigation.gif" alt="navigation"></p>
+<h2 id="sending-http-requests">Sending HTTP requests</h2>
+<p>Once the app is interactive and we can select a request, we can implement a handler for the <code>Enter</code> key as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#75715e">// impl App ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">selected_request</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#a6e22e">HttpRequest</span> {
+</span></span><span style="display:flex;"><span>    self.requests[self.list.selected().unwrap()].clone()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//....
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>KeyCode::Enter <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> req <span style="color:#f92672">=</span> app.seleted_request();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> data <span style="color:#f92672">=</span> <span style="color:#66d9ef">match</span> rq_core::request::execute(<span style="color:#f92672">&amp;</span>req).<span style="color:#66d9ef">await</span> {
+</span></span><span style="display:flex;"><span>    Ok(r) <span style="color:#f92672">=&gt;</span> r,
+</span></span><span style="display:flex;"><span>    Err(e) <span style="color:#f92672">=&gt;</span> e.to_string(),
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  app.response_buffer <span style="color:#f92672">=</span> data;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>I have implemented the <code>execute</code> function in the last post, you can take a look at the source <a href="https://github.com/protiumx/rq/blob/main/rq-core/src/request.rs">here</a>.</p>
+<p>The UI is practically finished: the user can navigate with arrow keys and hit <code>Enter</code> to execute a request.</p>
+<h2 id="bonus-multi-threading">Bonus: Multi-threading</h2>
+<p>The problem we are facing now is that, even though the request is executed <code>async</code> with <code>tokio</code>, it is
+blocking the main thread because we are <code>awaiting</code> it. If we send a slow request, the UI won&rsquo;t receive updates nor
+key events until the request is done.</p>
+<p>A proper solution would be to <code>spawn</code> a new thread to perform the request and assign the response to the app <code>response_buffer</code> once it finishes.
+If you have worked before with a compiled language like <code>C++</code> or <code>C#</code>, you will know that we need to access to
+the <code>app</code> variable in a <strong>thread-safe</strong> way by using a <code>mutex</code> (mutual exclusion object):
+In short, we want to <strong>block</strong> any other thread from accessing to the <code>app</code> state at the same time that we want to change it.</p>
+<p>Furthermore, we also need to take into account the lifetime checks made by the rust compiler.
+If we simply <strong>move</strong> a variable into a new thread, its ownership is moved and thus the variable is killed once
+the thread finishes. The solution? use a <code>pointer</code> to &ldquo;leak&rdquo; the <code>app</code> variable into another thread.</p>
+<p>Without entering into details that are out of the scope of this article, I will use an <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html">Atomically Reference Counted</a>,
+from the rust <strong>standard library</strong>, to create a shared pointer of a <code>Mutex</code>. The multi-thread implementation looks like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rs" data-lang="rs"><span style="display:flex;"><span><span style="color:#75715e">// app_arc: Arc&lt;tokio::sync::Mutex&lt;App&gt;&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>KeyCode::Enter <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// create a new reference
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">let</span> app_arc <span style="color:#f92672">=</span> app_arc.clone();
+</span></span><span style="display:flex;"><span>  tokio::spawn(<span style="color:#66d9ef">async</span> <span style="color:#66d9ef">move</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// the ownership of app_arc was now moved into this thread
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#66d9ef">let</span> data <span style="color:#f92672">=</span> <span style="color:#66d9ef">match</span> rq_core::request::execute(<span style="color:#f92672">&amp;</span>req).<span style="color:#66d9ef">await</span> {
+</span></span><span style="display:flex;"><span>          Ok(r) <span style="color:#f92672">=&gt;</span> r,
+</span></span><span style="display:flex;"><span>          Err(e) <span style="color:#f92672">=&gt;</span> e.to_string(),
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// here we use the tokio Mutex to lock our variable since we want to write data into it
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#66d9ef">let</span> app <span style="color:#f92672">=</span> app_arc.lock().<span style="color:#66d9ef">await</span>;
+</span></span><span style="display:flex;"><span>      app.response_buffer <span style="color:#f92672">=</span> data;
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// at this point the thread exists and app_arc is killed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#75715e">// app is also killed, unlocking it.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The result:
+<img src="./result.gif" alt="result"></p>
+<p>As you can see, we can navigate while a request is being executed. The UI keeps responsive. Perfect!</p>
+<p>This is it for today, I hope you learned something new.</p>
+<p>You can check out the repo <a href="https://github.com/protiumx/rq">here</a>.
+If you would like to collaborate with this project there are some TODOs over <a href="https://github.com/protiumx/rq/projects/1">here</a>.</p>
+<p>Thanks for reading!</p>
+<p><strong>Other articles:</strong></p>
+<ul>
+<li><a href="https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/">My profile website is now a terminal</a></li>
+<li><a href="https://protiumx.dev/blog/posts/an-http-request-parser-with-rust-and-pest.rs/">An HTTP request parser with rust and pest.rs</a></li>
+<li>My dotfiles: <a href="https://github.com/protiumx/.dotfiles">https://github.com/protiumx/.dotfiles</a></li>
+<li>My blog source: <a href="https://github.com/protiumx/blog">https://github.com/protiumx/blog</a></li>
+</ul>
+<p>👽</p>
+]]></content></item><item><title>My profile website is now a terminal</title><link>https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/</link><pubDate>Wed, 25 May 2022 11:42:13 +0200</pubDate><guid>https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/</guid><description>When I was younger I used to think that my profile website would be a really cool, fully featured website, with shiny colors and animations; built with the latest cutting edge frontend technology&amp;hellip; Turns out that the older I get the more I prefer a simple terminal. No UI, just text and commands.
 The last time I updated my profile website, it looked like this:
 It was already pretty minimalistic, right?</description><content type="html"><![CDATA[<p>When I was younger I used to think that my profile website would be a really cool, fully featured website, with shiny colors and animations; built with the latest cutting edge frontend technology&hellip;
 Turns out that the older I get the more I prefer a simple terminal. No UI, just text and commands.</p>
