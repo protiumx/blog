@@ -63,7 +63,7 @@ one for the list of HTTP requests and one for the current response:
 
 Let's start from scratch. To enter into the "interactive" mode, we need to clear the whole screen.
 For that we will use the following escape sequences:
-```rs
+```rust
 println!("\r\x1b[2J\r\x1b[H");
 ```
 ![wut](https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif)
@@ -79,7 +79,7 @@ about how to parse HTTP request with rust). Based on the design, the selected re
 HTTP method in green, URL in white and body in orange. If the request is selected, the whole request line should be green.
 Let's write a helper function:
 
-```rs
+```rust
 fn draw_request(req: &HttpRequest) -> String {
   let mut request_line = format!("{} {} HTTP/{}", colorize(Color::Green, req.method), req.url, req.version);
   if !req.header.is_empty() {
@@ -95,7 +95,7 @@ If you followed along my last post, you may have an idea of what the `colorize` 
 Now we are able to print all the request. Since we will use `>` to visually mark which request is 
 selected, we need to cater some space for it, hence we will print two empty spaces before each request start:
 
-```rs
+```rust
 for req in http_file.requests {
   println!("  {}\n", draw(&req));
 }
@@ -127,7 +127,7 @@ terminal apps like [bottom](https://github.com/ClementTsang/bottom). I headed ov
 and used the `list` example as a base.
 
 After a small refactor:
-```rs
+```rust
 fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   // Split the screen into 2 vertical portions
   let chunks = Layout::default()
@@ -156,7 +156,7 @@ fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 So we are at the same point as when using ANSI escape sequences to render the UI.
 This time we can easily implement a key handler and deal with the user interaction:
 
-```rs
+```rust
 match event::read()? {
     Event::Key(key) => match key.code {
         KeyCode::Down => app.next(),
@@ -167,7 +167,7 @@ match event::read()? {
 ```
 where `app` is an instance of the `App` struct:
 
-```rs
+```rust
 struct App {
     list: ListState, // from tui-rs
     requests: Vec<HttpRequest>,
@@ -203,7 +203,7 @@ Sweet! Now it is possible to navigate between requests:
 
 Once the app is interactive and we can select a request, we can implement a handler for the `Enter` key as follows:
 
-```rs
+```rust
 // impl App ...
 fn selected_request(&self) -> HttpRequest {
     self.requests[self.list.selected().unwrap()].clone()
@@ -241,7 +241,7 @@ the thread finishes. The solution? use a `pointer` to "leak" the `app` variable 
 
 Without entering into details that are out of the scope of this article, I will use an [Atomically Reference Counted](https://doc.rust-lang.org/std/sync/struct.Arc.html),
 from the rust **standard library**, to create a shared pointer of a `Mutex`. The multi-thread implementation looks like:
-```rs
+```rust
 // app_arc: Arc<tokio::sync::Mutex<App>>
 
 KeyCode::Enter => {
