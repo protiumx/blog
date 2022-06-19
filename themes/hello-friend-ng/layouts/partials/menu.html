@@ -2,7 +2,11 @@
     <ul class="menu__inner">
         {{- $currentPage := . -}}
         {{ range .Site.Menus.main -}}
-            <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+          {{ if hasPrefix .URL "https://" }}
+          <li><a href="{{ .URL | relLangURL }}" target="_blank">{{ .Name }}</a></li>
+          {{ else }}
+          <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+          {{ end }}
         {{- end }}
 
         {{- if .Site.Params.EnableGlobalLanguageMenu }}

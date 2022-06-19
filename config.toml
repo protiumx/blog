@@ -80,7 +80,6 @@ PygmentsStyle = "monokai"
     identifier = "github"
     name       = "github"
     url        = "https://github.com/protiumx"
-    target = "_blank"
 
 [languages]
   [languages.en]   

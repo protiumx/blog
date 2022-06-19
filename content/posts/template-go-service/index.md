@@ -6,10 +6,10 @@ published: true
 toc: false
 tags:
   - go
-  - github
-  - template
+  - github template
   - postgres
   - docker
+  - database
 ---
 As a weekend project I created a github template that can be very handy for creating go services with relational databases.
 Let's take a look at what is included.
@@ -58,9 +58,9 @@ When working with `make` you can pass arguments/variables a target, for instance
 hello:
   @echo $(name)
 ```
-To pass the argument you would call it like `make hello name=dev`. This can become tedious when passing args to the inner command.
-A simple hack to allow cli args is to filter out those `args` from the targets and also avoid errors for
-targets that are not found:
+To pass the argument you would call it like `make hello name=dev`. This can become tedious when passing multiple args to the inner command.
+A simple hack to allow cli args is to filter out those `args` from the make `goals` and also avoid errors when
+targets are not found:
 ```make
 # Filter out make goals from CLI args
 args = $(filter-out $@,$(MAKECMDGOALS))
@@ -72,7 +72,7 @@ hello:
 ```
 It works fine unless the arguments have a value that matches the name of any target.
 
-On the other hand, `task` provides a template variable `CLI_ARGS`
+On the other hand, `task` provides a simple template variable with the arguments `CLI_ARGS`
 ```yml
 hello:
   cmds:
@@ -102,7 +102,8 @@ db-gen:
 So far `task` seems to be a very good alternative to `make`, at least for my personal use case.
 
 ## Folder structure
-The folder structure of this template is based on folder structures I've seen across many go repos.
+The folder structure of this template is based on folder structures I've seen across many go repos,
+which I really like:
 ```
 - `cmd/`: app entry points
 - `db/`:
@@ -157,13 +158,13 @@ The template provides a multi-stage `Dockerfile`. It uses the official `golang:1
 a `scrath` image to copy the binaries.
 
 A `docker-compose` file can be used to get a db instance and run migrations on it. In this cases the migrations
-service waits for the postgres service to be ready, so we only need to do `docker-compose up -d`.
+service waits for the postgres service to be ready, so we only need to run `docker-compose up -d`.
 
 ## CI
 A github actions workflow is provided to run `go fmt, vet, test` and [gosec](https://github.com/securego/gosec).
 An initial configuration for `dependabot` is also provided.
 
-That's it, go take a look at the repo [here](https://github.com/protiumx/template-go-service)
+That's it, go take a look at the repo [here](https://github.com/protiumx/template-go-service).
 
 Thanks for reading :alien:
 
