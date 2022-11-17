@@ -1,4 +1,145 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on protiumx blog</title><link>https://protiumx.dev/blog/posts/</link><description>Recent content in Posts on protiumx blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Sun, 19 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://protiumx.dev/blog/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Github template for Golang services</title><link>https://protiumx.dev/blog/posts/github-template-for-golang-services/</link><pubDate>Sun, 19 Jun 2022 00:00:00 +0000</pubDate><guid>https://protiumx.dev/blog/posts/github-template-for-golang-services/</guid><description>As a weekend project I created a github template that can be very handy for creating go services with relational databases. Let&amp;rsquo;s take a look at what is included.
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on protiumx blog</title><link>https://protiumx.dev/blog/posts/</link><description>Recent content in Posts on protiumx blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0&lt;/a></copyright><lastBuildDate>Thu, 17 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://protiumx.dev/blog/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>An interpreted language you can try in my terminal website</title><link>https://protiumx.dev/blog/posts/an-interpreted-language-you-can-try-in-my-terminal-website/</link><pubDate>Thu, 17 Nov 2022 00:00:00 +0000</pubDate><guid>https://protiumx.dev/blog/posts/an-interpreted-language-you-can-try-in-my-terminal-website/</guid><description>A few weeks ago I started reading Writing An Interpreter In Go and while reading it and implementing the interpreter a question popped up: what if I can run this interpreter in the terminal in my website?
+To recap, a few months ago I decided to transform my personal website into a terminal (read more about it here). In today&amp;rsquo;s post I&amp;rsquo;ll give an overview of the whole implementation, but first a preview:</description><content type="html"><![CDATA[<p>A few weeks ago I started reading <a href="https://interpreterbook.com/">Writing An Interpreter In Go</a> and
+while reading it and implementing the interpreter a question popped up: what if I can run this
+interpreter in the terminal in my website?</p>
+<p>To recap, a few months ago I decided to transform my personal <a href="https://protiumx.dev">website</a> into
+a terminal (read more about it <a href="https://protiumx.dev/blog/posts/my-profile-website-is-now-a-terminal/">here</a>).
+In today&rsquo;s post I&rsquo;ll give an overview of the whole implementation, but first a preview:</p>
+<p><img src="./preview-simia.gif" alt="preview"></p>
+<p>You can try it by typing <code>simia</code> in the terminal <a href="https://protiumx.dev">here</a></p>
+<h2 id="the-book-a-great-resource-for-learning-about-interpreters">The book: a great resource for learning about interpreters</h2>
+<p><img src="./book-cover.png" alt="book cover"></p>
+<p>Although this post is not a book review, I&rsquo;d like to say that it was a really nice reading.
+You can learn from the basics of tokenization to the evaluation of the parsed input.
+The author does a great job guiding the reader through all the concepts with concrete examples.
+If you want to learn about how interpreters and REPL work this book is definitely a great start!</p>
+<h2 id="extending-the-monkey-language">Extending the Monkey language</h2>
+<p>In the book, the author introduces us to the <code>Monkey</code> language.
+Its syntax is quite simple and that motivated me to add more expressions and syntax, essentially extending
+the language to my desire. I wanted to create a language that would combine syntax from <code>go</code>, <code>rust</code>, and
+<code>elixir</code>. And that&rsquo;s how <a href="https://github.com/protiumx/simia">simia</a> was born.
+I&rsquo;m still working on it but so far I have added support for:</p>
+<ul>
+<li><code>Range</code> expressions</li>
+<li><code>for-loop</code> expressions along with the infix operator <code>in</code>. e.g.</li>
+</ul>
+<pre tabindex="0"><code>for a in 1..10 { 
+  log(a); 
+}
+</code></pre><ul>
+<li>Support for boolean condition in <code>for-loop</code></li>
+</ul>
+<pre tabindex="0"><code>for a &gt; 0 { 
+  log(a); 
+}
+</code></pre><ul>
+<li>Parentheses are optional for <code>if</code> and <code>for-loop</code> expressions</li>
+<li>Support for elixir&rsquo;s <code>pipe</code> operator <code>|&gt;</code></li>
+</ul>
+<pre tabindex="0"><code>8 |&gt; factorial() |&gt; add(100)
+</code></pre><ul>
+<li>Re-assign variables with <code>=</code> operator</li>
+</ul>
+<pre tabindex="0"><code>let foo = &#34;bar&#34;;
+foo = &#34;1234&#34;;
+</code></pre><p>And in my TODO list:</p>
+<ul>
+<li>Support modules</li>
+<li>Support <code>pub</code> key</li>
+<li>Add more built-ins for arrays, strings, and maps</li>
+<li>Support <code>mut</code> key and control mutability</li>
+</ul>
+<p>Overall, I want <code>simia</code> to be some sort of modern functional programming language.</p>
+<h2 id="loading-the-interpreter-in-the-browser-webassembly">Loading the interpreter in the browser: WebAssembly</h2>
+<p>If you are not familiar with <code>wasm</code>, here a quote from <a href="https://webassembly.org/">https://webassembly.org/</a></p>
+<blockquote>
+<p>WebAssembly (abbreviated Wasm) is a binary instruction format for a stack-based virtual machine.
+Wasm is designed as a portable compilation target for programming languages, enabling deployment on
+the web for client and server applications.</p>
+</blockquote>
+<p>Basically it allows us to convert the <code>simia</code> interpreter (written with golang) into a set of instructions that the browser
+can understand and execute.</p>
+<p>Doing this in <code>golang</code> was really simple thanks to the <a href="https://pkg.go.dev/syscall/js">syscall/js</a>
+package and the arch <code>wasm</code> when compiling the interpreter.
+Let&rsquo;s see a simple example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;syscall/js&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">done</span> <span style="color:#f92672">:=</span> make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Global</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;wasmHash&#34;</span>, <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">FuncOf</span>(<span style="color:#a6e22e">hash</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">done</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hello</span>(<span style="color:#a6e22e">this</span> <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Value</span>, <span style="color:#a6e22e">args</span> []<span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Value</span>) <span style="color:#a6e22e">any</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;hello &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">args</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">String</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Notice the <code>channel</code> we keep waiting for input. This is necessary because the wasm module <strong>it is an application</strong>
+and not a library. So this application should keep running and not exit as soon as <code>js.Global()...</code> is executed.</p>
+<p>Now we compile the app to wasm:</p>
+<pre tabindex="0"><code>GOOS=js GOARCH=wasm go build -o hello.wasm ./main.go 
+</code></pre><p>In order to load our wasm we need to use the wasm tools go provides</p>
+<pre tabindex="0"><code>cp &#34;$(go env GOROOT)/misc/wasm/wasm_exec.js&#34; . 
+</code></pre><p>and now the final bit, we load the wasm from js and use our wonderful <code>hello</code> function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">html</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">head</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>/&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;wasm_exec.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">go</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Go</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">WebAssembly</span>.<span style="color:#a6e22e">instantiateStreaming</span>(<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#34;hello.wasm&#34;</span>), <span style="color:#a6e22e">go</span>.<span style="color:#a6e22e">importObject</span>).<span style="color:#a6e22e">then</span>((<span style="color:#a6e22e">result</span>) =&gt; {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">go</span>.<span style="color:#a6e22e">run</span>(<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">instance</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(window.<span style="color:#a6e22e">hello</span>(<span style="color:#e6db74">&#34;universe&#34;</span>)); <span style="color:#75715e">// hello universe
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        });
+</span></span><span style="display:flex;"><span>    &lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">head</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">body</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">body</span>&gt;
+</span></span></code></pre></div><p>And that&rsquo;s it, serving the file and opening it in a browser should show the result in the developer console.
+I took exactly the same steps to compile and use the <code>simia</code> interpreter in the browser.
+The wasm module exports to objects:</p>
+<ul>
+<li><code>simia</code>: a function that evaluates simia code and returns the result</li>
+<li><code>simia_version</code>: the version of the interpreter</li>
+</ul>
+<h3 id="caveats">Caveats</h3>
+<p>All was going beautifully but I had to step back to think about a problem: <code>simia</code> has a built-in function
+called <code>log</code> which prints values to the stdout using the <code>fmt</code> package.
+When compiled to wasm, the <code>fmt.Println</code> will use <code>console.log</code> as a buffer, so any <code>log</code> instruction will be print
+into the browser console.</p>
+<p>The solution is to modify the built-in to use a buffer and then pass some sort of buffer from javascript,
+so then I can use that buffer to print to the terminal element. I will probably will solve this during the
+weekend, but if you have a better idea please let me know in the comments.</p>
+<h2 id="extending-my-website-terminal">Extending my website terminal</h2>
+<p>When I came up with the idea of adding the REPL into my website, I took a look at the existing code in my website
+and identified the requirements needed to make this happen:</p>
+<ul>
+<li>The wasm module can be loaded on demand, i.e. the first time the user calls <code>simia</code> from the terminal</li>
+<li>Commands should be able <strong>take</strong> the std in and out.</li>
+<li>The REPL will use the <code>wasm</code> module to eval the user input</li>
+<li><code>ctrl-c</code> should &ldquo;kill&rdquo; the process and return to the shell</li>
+</ul>
+<p>In other to implement this requirements I have prepared a few refactors:</p>
+<ul>
+<li>Improve error handling, e.g. &ldquo;command missing&rdquo;, &ldquo;wrong arguments&rdquo;, etc</li>
+<li>Improve key presses handling and extract common functionality</li>
+<li>Introduce <code>processId</code>. When a command execution returns a process Id it means that the main function, let&rsquo;s call it
+shell, should stop processing the input. Once the command exits it should call a callback to restore the main function.</li>
+</ul>
+<p>That&rsquo;s it, I can say that now my terminal has a fully working simia REPL.</p>
+<h2 id="outro">Outro</h2>
+<p>I had a lot of fun writing the interpreter and loading it into my terminal website, I definitely learned
+a lot of things in the process. I think writing an interpreter is quite a good practice for any developer.</p>
+<p>All the changes I made to my website were introduced in this <a href="https://github.com/protiumx/protiumx.github.io/pull/4/files">PR</a></p>
+<p>What else would you add to the language or the terminal?
+I&rsquo;m planning to do some sort of treasure hunt in my website, stay tuned!</p>
+<p>👽</p>
+]]></content></item><item><title>Github template for Golang services</title><link>https://protiumx.dev/blog/posts/github-template-for-golang-services/</link><pubDate>Sun, 19 Jun 2022 00:00:00 +0000</pubDate><guid>https://protiumx.dev/blog/posts/github-template-for-golang-services/</guid><description>As a weekend project I created a github template that can be very handy for creating go services with relational databases. Let&amp;rsquo;s take a look at what is included.
 Task Runner For many years, GNU make has been my to-go tool to run rules and tasks for any sort of project. It is fairly simple to use but it can also become complex as some rules might require to execute external tools or even declare bash functions with in a rule definition.</description><content type="html"><![CDATA[<p>As a weekend project I created a github template that can be very handy for creating go services with relational databases.
 Let&rsquo;s take a look at what is included.</p>
 <h2 id="task-runner">Task Runner</h2>
