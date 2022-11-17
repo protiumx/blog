@@ -58,7 +58,7 @@ PygmentsStyle = "monokai"
   url  = "https://www.linkedin.com/in/bdmayo/"
 
 [params.logo]
-    logoText     = "$ cat protiumx/blog"
+    logoText     = "$ cat protiumx/blog/*"
     logoHomeLink = "/"
     logoCursorColor = "#c7157a"
 
