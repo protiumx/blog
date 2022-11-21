@@ -72,7 +72,7 @@ Let&rsquo;s see a simple example:</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">done</span> <span style="color:#f92672">:=</span> make(<span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}, <span style="color:#ae81ff">0</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Global</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;wasmHash&#34;</span>, <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">FuncOf</span>(<span style="color:#a6e22e">hash</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">Global</span>().<span style="color:#a6e22e">Set</span>(<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#a6e22e">js</span>.<span style="color:#a6e22e">FuncOf</span>(<span style="color:#a6e22e">hello</span>))
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">done</span>
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
