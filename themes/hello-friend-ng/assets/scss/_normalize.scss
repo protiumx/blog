@@ -10,17 +10,18 @@
 
 /* Webkit Scrollbar Customize */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: #212020;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #fe5186;
+}
 
-  &:hover {
-    background: #dcdcdc;
-  }
+* {
+  scrollbar-color: #fe5186 #212020;
+  scrollbar-width: thin;
 }
 
 html {

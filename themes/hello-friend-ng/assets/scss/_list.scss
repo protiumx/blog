@@ -1,6 +1,6 @@
 .posts {
   width: 100%;
-  max-width: 800px;
+  max-width: 880px;
   text-align: left;
   padding: 20px;
   margin: 20px auto;
@@ -11,23 +11,7 @@
 
   &:not(:last-of-type) {
     // Default
-    border-bottom: 1px solid $light-border-color;
-
-    @media (prefers-color-scheme: dark) {
-      border-bottom: 1px solid $dark-border-color;
-    }
-  
-    @media (prefers-color-scheme: light) {
-      border-bottom: 1px solid $light-border-color;
-    }
-  
-    [data-theme=dark] & {
-      border-bottom: 1px solid $dark-border-color;
-    }
-  
-    [data-theme=light] & {
-      border-bottom: 1px solid $light-border-color;
-    }
+    border-bottom: 1px solid $dark-border-color;
   }
 
   &-group {
@@ -50,7 +34,13 @@
   .post {
     &-title {
       font-size: 1rem;
-      margin: 5px 0 5px 0;
+      font-weight: bold;
+      margin: 5px 0 5px .5em;
+      text-transform: lowercase;
+    }
+
+    &-sep {
+      margin-left: .5em;
     }
 
     &-year {
@@ -65,20 +55,18 @@
     }
 
     &-item {
-      border-bottom: 1px grey dashed;
-
+      min-height: 38px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      padding: 6px 0;
       a {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        padding: 12px 0;
         text-decoration: none;
       }
     }
 
     &-day {
       flex-shrink: 0;
-      margin-left: 1em;
       @include dimmed;
     }
   }
