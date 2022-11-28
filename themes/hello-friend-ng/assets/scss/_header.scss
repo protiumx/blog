@@ -5,23 +5,7 @@
   position: relative;
   padding: 20px;
   // Default
-  background: $light-background-header;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-background-header;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-background-header;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-background-header;
-  }
-
-  [data-theme=light] & {
-    background: $light-background-header;
-  }
+  background: $dark-background;
 
   &__right {
     display: flex;
@@ -41,18 +25,6 @@
     width: 760px;
     max-width: 100%;
   }
-}
-
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.theme-toggler {
-  fill: currentColor;
 }
 
 .not-selectable {

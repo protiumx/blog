@@ -1,23 +1,5 @@
 .menu {
   z-index: 9999;
-  // Default
-  background: $light-background-header;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-background-header;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-background-header;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-background-header;
-  }
-
-  [data-theme=light] & {
-    background: $light-background-header;
-  }
 
   @media #{$media-size-phone} {
     position: absolute;
@@ -84,24 +66,6 @@
 
 
 .submenu {
-  background: $light-background-header;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-background-header;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-background-header;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-background-header;
-  }
-
-  [data-theme=light] & {
-    background: $light-background-header;
-  }
-
   ul {
     list-style-type: none;
     margin: 0;
@@ -122,18 +86,6 @@
     display: none;
     position: absolute;
     background: $dark-background-header;
-
-    @media (prefers-color-scheme: light) {
-      background: $light-background-header;
-    }
-    
-    [data-theme=dark] & {
-      background: $dark-background-header;
-    }
-  
-    [data-theme=light] & {
-      background: $light-background-header;
-    }
   }
 
   .dropdown-content a {
@@ -145,18 +97,6 @@
 
   .dropdown-content a:hover {
     background: $dark-background-header;
-    
-    @media (prefers-color-scheme: light) {
-      background: $light-background-header;
-    }
-
-    [data-theme=dark] & {
-      background: $dark-background-header;
-    }
-  
-    [data-theme=light] & {
-      background: $light-background-header;
-    }
   }
 
   .dropdown:hover .dropdown-content {

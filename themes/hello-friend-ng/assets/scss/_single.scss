@@ -39,6 +39,12 @@
 
   &-content {
     margin-top: 30px;
+
+    & > p:last-of-type::after {
+      margin: 0 0.5rem;
+      content: "■";
+      color: $accent-color;
+    }
   }
 
   &-cover {
@@ -128,28 +134,8 @@
       letter-spacing: 0.1em;
       z-index: 1;
       // Default
-      background: $light-background;
-      color: $light-color-secondary;
-
-      @media (prefers-color-scheme: dark) {
-        background: $dark-background;
-        color: $dark-color-secondary;
-      }
-    
-      @media (prefers-color-scheme: light) {
-        background: $light-background;
-        color: $light-color-secondary;
-      }
-    
-      [data-theme=dark] & {
-        background: $dark-background;
-        color: $dark-color-secondary;
-      }
-    
-      [data-theme=light] & {
-        background: $light-background;
-        color: $light-color-secondary;
-      }
+      background: $dark-background;
+      color: $dark-color-secondary;
     }
 
     hr {
@@ -164,8 +150,17 @@
 
   &__buttons {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    text-transform: lowercase;
+   
+    .previous {
+      align-self: flex-start;
+    }
+
+    .next {
+      align-self: flex-end;
+    }
 
     a {
       text-decoration: none;
@@ -187,23 +182,7 @@
   cursor: pointer;
   appearance: none;
   // Default
-  background: $light-background-secondary;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-background-secondary;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-background-secondary;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-background-secondary;
-  }
-
-  [data-theme=light] & {
-    background: $light-background-secondary;
-  }
+  background: $dark-background-secondary;
 
   + .button {
     margin-left: 10px;
@@ -222,6 +201,10 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+  }
+
+  &.next {
+    justify-self: flex-end;
   }
 
   &.next .button__icon {

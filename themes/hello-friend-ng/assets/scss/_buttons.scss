@@ -22,50 +22,16 @@ a.button {
   cursor: pointer;
   outline: none;
   // Default
-  background: $light-background-header;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-background-header;
-    color: inherit;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-background-header;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-background-header;
-    color: inherit;
-  }
-
-  [data-theme=light] & {
-    background: $light-background-header;
-  }
+  background: $dark-background-header;
+  color: inherit;
 
   &.outline {
     background: transparent;
     box-shadow: none;
     padding: 8px 18px;
     // Default
-    border-color: $light-background-secondary;
-
-    @media (prefers-color-scheme: dark) {
-      border-color: $dark-background-secondary;
-      color: inherit;
-    }
-  
-    @media (prefers-color-scheme: light) {
-      border-color: $light-background-secondary;
-    }
-  
-    [data-theme=dark] & {
-      border-color: $dark-background-secondary;
-      color: inherit;
-    }
-  
-    [data-theme=light] & {
-      border-color: $light-background-secondary;
-    }
+    border-color: $dark-background-secondary;
+    color: inherit;
 
     :hover {
       transform: none;
@@ -93,47 +59,5 @@ a.button {
   &.wide {
     min-width: 200px;
     padding: 14px 24px;
-  }
-}
-
-.code-toolbar {
-  margin-bottom: 20px;
-
-  .toolbar-item a {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 8px;
-    margin-bottom: 5px;
-    text-decoration: none;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 500;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    appearance: none;
-    cursor: pointer;
-    outline: none;
-    // Default
-    background: $light-background-secondary;
-
-    @media (prefers-color-scheme: dark) {
-      background: $dark-background-secondary;
-      color: inherit;
-    }
-  
-    @media (prefers-color-scheme: light) {
-      background: $light-background-secondary;
-    }
-  
-    [data-theme=dark] & {
-      background: $dark-background-secondary;
-      color: inherit;
-    }
-  
-    [data-theme=light] & {
-      background: $light-background-secondary;
-    }
   }
 }

@@ -14,7 +14,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Roboto",
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Roboto",
     "Segoe UI", Helvetica, Arial, sans-serif;
   font-display: auto;
   font-size: 1rem;
@@ -30,31 +30,11 @@ body {
   flex-direction: column;
 
   // Default
-  background-color: $light-background;
-  color: $light-color;
+  background-color: $dark-background;
+  color: $dark-color;
 
   @media #{$media-size-phone} {
     font-size: 1rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    background-color: $dark-background;
-    color: $dark-color;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background-color: $light-background;
-    color: $light-color;
-  }
-
-  [data-theme=dark] & {
-    background-color: $dark-background;
-    color: $dark-color;
-  }
-
-  [data-theme=light] & {
-    background-color: $light-background;
-    color: $light-color;
   }
 }
 
@@ -105,6 +85,10 @@ h4 {
 
 a {
   color: inherit;
+  &:hover {
+    color: $accent-color;
+    transition: color 0.5s ease;
+  }
 }
 
 img {
@@ -191,29 +175,16 @@ figure {
   }
 }
 
-em, i, strong {
+em,
+i,
+strong {
   // Default
-  color: $light-color-variant;
-
-  @media (prefers-color-scheme: dark) {
-    color: $dark-color-variant;
-  }
-
-  @media (prefers-color-scheme: light) {
-    color: $light-color-variant;
-  }
-
-  [data-theme=dark] & {
-    color: white;
-  }
-
-  [data-theme=light] & {
-    color: black;
-  }
+  color: $dark-color-variant;
 }
 
 code {
-  font-family: CascadiaCode, Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace;
+  font-family: CascadiaCode, Consolas, Monaco, Andale Mono, Ubuntu Mono,
+    monospace;
   font-display: auto;
   font-feature-settings: normal;
   padding: 1px 6px;
@@ -221,29 +192,12 @@ code {
   border-radius: 5px;
   font-size: 0.95rem;
   // Default
-  background: $light-background-secondary;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-background-secondary;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-background-secondary;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-background-secondary;
-  }
-
-  [data-theme=light] & {
-    background: $light-background-secondary;
-  }
+  background: $dark-background-secondary;
 }
 
 pre {
-  background-color: #272822;
+  border: 2px solid $accent-color;
   padding: 10px 10px 10px 20px;
-  border-radius: 8px;
   font-size: 0.95rem;
   overflow: auto;
 
@@ -259,10 +213,17 @@ pre {
     font-size: inherit;
     color: #fff;
   }
+
+  &[class*="language-"] {
+    background-color: $dark-background !important;
+    border-radius: 0;
+    border: 2px solid $accent-color;
+    box-shadow: none;
+  }
 }
 
 blockquote {
-  border-left: 3px solid #3eb0ef;
+  border-left: 3px solid $accent-color;
   margin: 40px;
   padding: 10px 20px;
 
@@ -330,23 +291,7 @@ hr {
   border: none;
   height: 1px;
   // Default
-  background: $light-border-color;
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-border-color;
-  }
-
-  @media (prefers-color-scheme: light) {
-    background: $light-border-color;
-  }
-
-  [data-theme=dark] & {
-    background: $dark-border-color;
-  }
-
-  [data-theme=light] & {
-    background: $light-border-color;
-  }
+  background: $dark-border-color;
 }
 
 .hidden {
