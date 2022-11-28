@@ -10,7 +10,7 @@ disableSitemap = false
 disable404     = false
 enableEmoji     = true
 enableRobotsTXT = true
-defaultTheme = "light"
+defaultTheme = "dark"
 PygmentsStyle = "monokai"
 
 [author]
@@ -20,10 +20,10 @@ PygmentsStyle = "monokai"
   posts = "/posts/:title/"
 
 [params]
-  dateform        = "Jan 2, 2006"
-  dateformShort   = "Jan 2"
-  dateformNum     = "2006-22-01"
-  dateformNumTime = "2006-22-01"
+  dateform        = "2006-01-02"
+  dateformShort   = "2006-01-02"
+  dateformNum     = "2006-01-02"
+  dateformNumTime = "2006-01-02"
 
   # Subtitle for home
   homeSubtitle = "a simple dev blog"
